@@ -32,6 +32,10 @@ public class RoomService : IRoomService
             throw new InvalidOperationException("Room number already exists in this hotel");
 
         var room = _mapper.Map<Room>(createRoomDto);
+        
+          // Set default status
+        room.Status = RecordStatus.Available; 
+      
         var createdRoom = await _unitOfWork.Rooms.AddAsync(room);
         await _unitOfWork.SaveChangesAsync();
 

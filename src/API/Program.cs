@@ -5,14 +5,51 @@ using HotelManagementService.Core.Interfaces;
 using HotelManagementService.Infrastructure.Data;
 using HotelManagementService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using HotelFlowAPI.Core.Interfaces;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using HotelFlowAPI.Application.Services;
+using HotelmanagementService.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Hotel Management API",
+        Version = "v1",
+        Description = "A comprehensive hotel management system API",
+        Contact = new OpenApiContact
+        {
+            Name = "Hotel Management Team",
+            Email = "support@hotelmanagement.com"
+        }
+    });
+
+    // Include XML comments
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
+
+
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.WithOrigins("http://localhost:8080")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Database
 builder.Services.AddDbContext<HotelDbContext>(options =>
@@ -34,19 +71,23 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IRoomService,RoomService>();
-builder.Services.AddScoped<IGuestRepository, GuestRepository>();
+builder.Services.AddScoped<IGuestPreferenceService, GuestPreferenceService>();
 builder.Services.AddScoped<IParametersService, ParameterService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
-
-
-
+builder.Services.AddScoped<IGuestService, GuestService>();  
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<IPreferenceService, PreferenceService>();
+builder.Services.AddScoped<IAmenitiesService, AmenitiesService>();
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
+// Use CORS
+app.UseCors("AllowAll");
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -56,20 +97,14 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Ensure database is created and migrations applied
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    dbContext.Database.Migrate();
-}
-
 try
 {
    DbInitializer.DbInit(app);
 }
 catch( Exception e)
 {
-   Console.WriteLine(e);
+   Console.WriteLine(e.ToString());
+   throw;
 }
 
 app.Run();

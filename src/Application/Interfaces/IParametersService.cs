@@ -8,4 +8,5 @@ public interface IParametersService
     Task<IEnumerable<TaskTypeDto>> GetAllTaskTypesAsync();
     Task<ResponseDto> CreateTaskType(CreateTaskTypeDto createTaskTypeDto);
     Task<IEnumerable<RoomTypeDto>> GetRoomTypesAsync();
+
 }

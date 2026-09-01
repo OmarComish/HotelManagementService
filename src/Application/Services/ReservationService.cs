@@ -83,6 +83,7 @@ public class ReservationService : IReservationService
     }
     public async Task<ReservationDto> UpdateReservationAsync(UpdateReservationDto reservationdto)
     {
+        var response = new ResponseDto { Status = "error", Message = "Failed to save changes to reservation" };
         var reservation = await _unitOfWork.Reservations.GetByIdAsync(reservationdto.Id) 
         ?? throw new Exception("Resevation not found!");
 

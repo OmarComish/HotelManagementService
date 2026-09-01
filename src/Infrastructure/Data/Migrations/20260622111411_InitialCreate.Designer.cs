@@ -3,17 +3,20 @@ using System;
 using HotelManagementService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace HotelManagementService.Infrastructure.Migrations
+namespace HotelManagementService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622111411_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,68 +54,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Amenities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9738),
-                            Name = "AC"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9741),
-                            Name = "Balcony"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9744),
-                            Name = "Coffee Maker"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9746),
-                            Name = "Hair Dryer"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9749),
-                            Name = "Jacuzzi"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9752),
-                            Name = "Mini Bar"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9754),
-                            Name = "Room Service"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9757),
-                            Name = "Safe"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9759),
-                            Name = "TV"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9762),
-                            Name = "WiFi"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Booking", b =>
@@ -205,29 +146,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Departments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(7),
-                            CreatedBy = "Admin",
-                            Name = "Restuarant"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(10),
-                            CreatedBy = "Admin",
-                            Name = "House Keeping"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(13),
-                            CreatedBy = "Admin",
-                            Name = "Front Office"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Employee", b =>
@@ -268,44 +186,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(166),
-                            CreatedBy = "Admin",
-                            DepartmentId = 1,
-                            FirstName = "John",
-                            LastName = "Doe"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(170),
-                            CreatedBy = "Admin",
-                            DepartmentId = 2,
-                            FirstName = "Mary",
-                            LastName = "Johnson"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(174),
-                            CreatedBy = "Admin",
-                            DepartmentId = 3,
-                            FirstName = "Sarah",
-                            LastName = "Wilson"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(177),
-                            CreatedBy = "Admin",
-                            DepartmentId = 2,
-                            FirstName = "Tracy",
-                            LastName = "Morgan"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Guest", b =>
@@ -461,19 +341,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Hotels");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "123 Main Street, CBD",
-                            City = "",
-                            Country = "",
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9392),
-                            IsActive = true,
-                            Name = "Grand Hotel",
-                            StarRating = 0
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Invoice", b =>
@@ -749,56 +616,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Preferences");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9948),
-                            Name = "Non-smoking"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9951),
-                            Name = "Early checkin"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9953),
-                            Name = "High floor"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9955),
-                            Name = "Newspaper"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9957),
-                            Name = "Late checkout"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9959),
-                            Name = "Quiet room"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9961),
-                            Name = "Room service"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9963),
-                            Name = "Extra towels"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Reservation", b =>
@@ -1012,35 +829,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasIndex("RoomTypeId");
 
                     b.ToTable("Rooms");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9598),
-                            HotelId = 1,
-                            RoomNumber = "101",
-                            RoomTypeId = 1,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9642),
-                            HotelId = 1,
-                            RoomNumber = "102",
-                            RoomTypeId = 2,
-                            Status = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9646),
-                            HotelId = 1,
-                            RoomNumber = "201",
-                            RoomTypeId = 3,
-                            Status = 1
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.RoomAmenities", b =>
@@ -1076,148 +864,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasIndex("AmenitiesId");
 
                     b.ToTable("RoomAmenities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AmenitiesId = 9,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9838),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AmenitiesId = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9841),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AmenitiesId = 10,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9844),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AmenitiesId = 7,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9847),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AmenitiesId = 9,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9849),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AmenitiesId = 9,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9852),
-                            RoomTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            AmenitiesId = 10,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9855),
-                            RoomTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            AmenitiesId = 7,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9857),
-                            RoomTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            AmenitiesId = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9860),
-                            RoomTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            AmenitiesId = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9863),
-                            RoomTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 11,
-                            AmenitiesId = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9865),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 12,
-                            AmenitiesId = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9868),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 13,
-                            AmenitiesId = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9870),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 14,
-                            AmenitiesId = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9873),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 15,
-                            AmenitiesId = 5,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9875),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 16,
-                            AmenitiesId = 6,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9878),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 17,
-                            AmenitiesId = 7,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9880),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 18,
-                            AmenitiesId = 8,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9883),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 19,
-                            AmenitiesId = 9,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9886),
-                            RoomTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 20,
-                            AmenitiesId = 10,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9888),
-                            RoomTypeId = 3
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.RoomType", b =>
@@ -1255,35 +901,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RoomTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Capacity = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9540),
-                            CreatedBy = "admin",
-                            Price = 100.00m,
-                            Type = "Standard"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Capacity = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9545),
-                            CreatedBy = "admin",
-                            Price = 150.00m,
-                            Type = "Delux"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Capacity = 6,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9549),
-                            CreatedBy = "admin",
-                            Price = 300.00m,
-                            Type = "Standard"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.TaskItem", b =>
@@ -1387,48 +1004,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TaskTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(218),
-                            CreatedBy = "Admin",
-                            Name = "HouseKeeping",
-                            Title = "House Keeping"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(222),
-                            CreatedBy = "Admin",
-                            Name = "Maintenance",
-                            Title = "Maintenance"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(229),
-                            CreatedBy = "Admin",
-                            Name = "FrontDesk",
-                            Title = "Front Desk"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(232),
-                            CreatedBy = "Admin",
-                            Name = "Restaurant",
-                            Title = "Restaurant"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 938, DateTimeKind.Utc).AddTicks(235),
-                            CreatedBy = "Admin",
-                            Name = "Administration",
-                            Title = "Administration"
-                        });
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.User", b =>
@@ -1475,26 +1050,6 @@ namespace HotelManagementService.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9693),
-                            Email = "admin@hotel.com",
-                            Name = "Admin User",
-                            PasswordHash = "$2a$11$hash",
-                            Role = "Admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 19, 20, 59, 58, 937, DateTimeKind.Utc).AddTicks(9696),
-                            Email = "staff@hotel.com",
-                            Name = "Staff Member",
-                            PasswordHash = "$2a$11$hash",
-                            Role = "Staff"
-                        });
                 });
 
             modelBuilder.Entity("RoomAmenitiesRoomType", b =>

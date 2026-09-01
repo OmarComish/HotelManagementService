@@ -27,7 +27,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.RoomType != null? src.RoomType.Type: string.Empty))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.RoomType.Price))
             .ForMember(dest => dest.HotelName, opt => opt.MapFrom(src => src.Hotel != null ? src.Hotel.Name : null))
-            .ForMember(dest =>dest.Amenitieslist, opt=>opt.MapFrom(src=>src.RoomType.Amenities));
+            .ForMember(dest =>dest.Amenitieslist, 
+             opt=>opt.MapFrom(src=>src.RoomType!= null? 
+             src.RoomType.Amenities.Select(ra => ra.Amenities):Enumerable.Empty<Amenities>()));
 
         //Invoice
         CreateMap<Invoice, CreateInvoiceDto>().ReverseMap();
@@ -59,5 +61,24 @@ public class MappingProfile : Profile
          //RoomType mappings
         CreateMap<CreateRoomTypeDto, RoomType>();
         CreateMap<RoomType, RoomTypeDto>();
+
+        //MenuItem mappings
+        CreateMap<CreateMenuItemDto, MenuItem>();
+        CreateMap<MenuItem, MenuItemDto>()
+          .ForMember(dest => dest.HotelName, opt => opt.MapFrom(src => src.Hotel != null ? src.Hotel.Name : null));
+    
+       //Guest preferences
+        CreateMap<CreateGuestPreferenceDto, GuestPreferences>();
+        CreateMap<GuestPreferences, GuestPreferenceDto>()
+            .ForMember(dest => dest.PreferenceName, opt => opt.MapFrom(src => src.Preferences != null ? src.Preferences.Name : null));
+    
+       //Preference mappings
+        CreateMap<CreatePreferenceDto, Preferences>();
+        CreateMap<Preferences, PreferenceDto>();
+
+        //Amenities mappings
+        CreateMap<CreateAmenitiesDto, Amenities>();
+        CreateMap<Amenities, AmenitiesDto>();
+    
     }
 }

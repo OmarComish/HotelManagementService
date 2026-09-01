@@ -11,10 +11,21 @@ public class RoomRepository : GenericRepository<Room>, IRoomRepository
 
     public async Task<IEnumerable<Room>> GetAllWithDetailsAsync()
     {
-        return await _context.Rooms
+        var rooms = await _context.Rooms
             .Include(r => r.RoomType)
+            .ThenInclude(rt => rt.Amenities)
+            .ThenInclude(a => a.Amenities)
             .Include(r => r.Hotel)
             .ToListAsync();
+
+            // DEBUG: Check before mapping
+        foreach (var room in rooms)
+        {
+            var amenityCount = room.RoomType?.Amenities?.Count ?? 0;
+            var nestedCount = room.RoomType?.Amenities?.SelectMany(a => new[] { a.Amenities }).Count() ?? 0;
+            Console.WriteLine($"Room {room.RoomNumber}: {amenityCount} join records, {nestedCount} amenities loaded");
+        }
+        return rooms;
     }
 
     public async Task<Room> GetByIdWithDetailsAsync(int id)

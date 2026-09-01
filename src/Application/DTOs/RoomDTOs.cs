@@ -7,8 +7,8 @@ public record CreateRoomDto(
     [Required] string RoomNumber,
     [Required] int RoomTypeId,
     [Required] decimal Price,
-    [Required] int Capacity
-    //[Required] int AmenitiesId 
+    [Required] int Capacity,
+    [Required] int[] AmenitiesId 
 );
 
 public record UpdateRoomDto(

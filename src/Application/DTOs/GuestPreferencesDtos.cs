@@ -20,3 +20,19 @@ public record GuestPreferenceDto
     public DateTime DateCreated { get; set; }
     public string? Status { get; set; }
 }
+
+public record PreferenceDto
+{
+    public int Id {get; set;}
+    public string? Name {get; set;} = null;
+    public string? CreatedBy { get; set; }=null;
+    public DateTime DateCreated { get; set; }
+    public string? Status { get; set; }
+}
+public record CreatePreferenceDto(
+    [Required] string Name
+);
+public record UpdatePreferenceDto(
+    [Required] int Id,
+    [Required] string Name
+);

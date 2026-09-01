@@ -47,7 +47,7 @@ public class GuestService :  IGuestService
             await _unitOfWork.SaveChangesAsync();
         }
 
-
+        /*
         if(createGuestDto.Booking!= null) //if booking details provided, create with booking
         {
             var room_details = await _unitOfWork.Rooms.GetByIdAsync(createGuestDto.Booking.RoomId);
@@ -65,7 +65,7 @@ public class GuestService :  IGuestService
             //await _unitOfWork.Bookings.AddAsync(booking);
             //await _unitOfWork.SaveChangesAsync();
         }
-
+        */
         //_logger.LogInformation("Guest created successfully with ID: {GuestId}", createdGuest.Id);
 
         //Step 4: Eager load preferences for mapping

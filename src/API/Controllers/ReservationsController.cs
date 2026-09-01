@@ -38,6 +38,11 @@ public class ReservationsController: ControllerBase
         if(updatereservationDto!= null)
         {
             response.Payload = await _reservationService.UpdateReservationAsync(updatereservationDto);
+            if(response.Payload != null)
+            {
+                response.Status = "success";
+                response.Message = "Reservation updated successfully";
+            }
         }
         return Ok(response);
     }

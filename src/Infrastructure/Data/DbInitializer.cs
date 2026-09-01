@@ -16,7 +16,7 @@ public class DbInitializer
     private static void SeedData(HotelDbContext context)
     {
         context.Database.Migrate();
-        if(context.Hotels.Any())
+        if(!context.Hotels.Any())
         {
             var hotels = new List<Hotel>
             {
@@ -25,19 +25,31 @@ public class DbInitializer
             context.AddRange(hotels);
             context.SaveChanges();
         }
-        
-        if(context.RoomTypes.Any())
+        if(!context.Departments.Any())
+        {
+            var departments = new List<Department>
+            {
+                new () { Id = 1, Name = "Housekeeping", CreatedAt = DateTime.UtcNow, CreatedBy="admin" },
+                new () { Id = 2, Name = "Maintenance", CreatedAt = DateTime.UtcNow, CreatedBy="admin" },
+                new () { Id = 3, Name = "Front Desk", CreatedAt = DateTime.UtcNow, CreatedBy="admin" },
+                new () { Id = 4, Name = "Restaurant", CreatedAt = DateTime.UtcNow, CreatedBy="admin" },
+                new () { Id = 5, Name = "Administration", CreatedAt = DateTime.UtcNow, CreatedBy="admin" }
+            };
+            context.AddRange(departments);
+            context.SaveChanges();
+        }
+        if(!context.RoomTypes.Any())
         {
             var roomtypes = new List<RoomType>
             {
                 new () { Id = 1, Type = "Standard", Price = 100.00m, Capacity = 2, CreatedBy = "admin", CreatedAt = DateTime.UtcNow },
                 new () { Id = 2, Type = "Delux", Price = 150.00m, Capacity = 4, CreatedBy = "admin", CreatedAt = DateTime.UtcNow },
-                new () {Id = 3, Type = "Standard", Price = 300.00m, Capacity = 6, CreatedBy = "admin", CreatedAt = DateTime.UtcNow}
+                new () {Id = 3, Type = "Suite", Price = 300.00m, Capacity = 6, CreatedBy = "admin", CreatedAt = DateTime.UtcNow}
             };
             context.AddRange(roomtypes);
             context.SaveChanges();
         }
-        if(context.Rooms.Any())
+        if(!context.Rooms.Any())
         {
             var rooms = new List<Room>
             {
@@ -48,7 +60,7 @@ public class DbInitializer
             context.AddRange(rooms);
             context.SaveChanges();
         }
-        if(context.Users.Any())
+        if(!context.Users.Any())
         {
             var users = new List<User>
             {
@@ -58,7 +70,7 @@ public class DbInitializer
             context.AddRange(users);
             context.SaveChanges();
         }
-        if(context.Amenities.Any())
+        if(!context.Amenities.Any())
         {
             var amenities = new List<Amenities>
             {
@@ -76,7 +88,7 @@ public class DbInitializer
             context.AddRange(amenities);
             context.SaveChanges();
         }
-        if(context.RoomAmenities.Any())
+        if(!context.RoomAmenities.Any())
         {
             var amenities = new List<RoomAmenities>
             {
@@ -105,7 +117,7 @@ public class DbInitializer
             context.AddRange(amenities);
             context.SaveChanges();
         }
-        if(context.Preferences.Any())
+        if(!context.Preferences.Any())
         {
             var preferences = new List<Preferences>
             {
@@ -121,19 +133,19 @@ public class DbInitializer
             context.AddRange(preferences);
             context.SaveChanges();
         }
-        if(context.Employees.Any())
+        if(!context.Employees.Any())
         {
             var employees = new List<Employee>
             {
                 new () {Id= 1, DepartmentId = 1, FirstName ="John", LastName ="Doe", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
                 new () {Id= 2, DepartmentId = 2, FirstName ="Mary", LastName ="Johnson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
                 new () {Id= 3, DepartmentId = 3, FirstName ="Sarah", LastName ="Wilson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
-                new () {Id= 4, DepartmentId = 2, FirstName ="Tracy", LastName ="Morgan", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"}  
+                new () {Id= 4, DepartmentId = 4, FirstName ="Tracy", LastName ="Morgan", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"}  
             };
             context.AddRange(employees);
             context.SaveChanges();
         }
-        if(context.TaskTypes.Any())
+        if(!context.TaskTypes.Any())
         {
             var tasktypes = new List<TaskType>
             {

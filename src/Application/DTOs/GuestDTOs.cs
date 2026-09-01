@@ -1,17 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelManagementService.Application.DTOs;
-public record CreateGuestDto(
-    [Required] string FirstName,
-    [Required] string LastName,
-    [Required] string PhoneNumber,
-    [Required] string Address,
-    [Required] string IDNumber,
-    string Email,
-    string Notes,
-    List<int>? PreferenceIds, // list of selected preferences
-    CreateBookingDto? Booking = null //optional booking
-);
+public record CreateGuestDto {
+    [Required] 
+    public string FirstName {get;init;}
+    [Required] 
+    public string LastName {get;init;}
+    [Required] 
+    public string PhoneNumber {get;init;}
+    [Required] 
+    public string Address {get;init;}
+    [Required] 
+    public string IDNumber {get;init;}
+    public string Email {get;init;}
+    public string Notes {get;init;}
+    public List<int> PreferenceIds {get;init;} // list of selected preferences
+    //CreateBookingDto? Booking = null //optional booking
+}
 
 public record UpdateGuestDto(
     [Required] string FirstName,

@@ -14,10 +14,13 @@ public interface IUnitOfWork : IDisposable
     IInvoiceLineItemRepository InvoiceLineItems {get;}
     IGuestRepository Guests {get;}
     IGuestPreferencesRepository GuestPreferences {get;}
+    IPreferenceRepository Preferences {get;}
     ITaskTypeRepository TaskTypes {get;}
     ITaskRepository TaskItems {get;}
     IUsersRepository Users {get;}
     IEmployeeRepository Employees {get;}
+    IMenuItemsRepository MenuItems {get;}
+    IAmenitiesRepository Amenities {get;}
 
     //Task<int> SaveChangesAsync();
     Task<int> SaveChangesAsync();
