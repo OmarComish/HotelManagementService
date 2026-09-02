@@ -24,5 +24,5 @@ public class RestaurantOrder : BaseEntity
     public virtual RestaurantTable Table { get; set; } = null!;
     public virtual Guest? Guest { get; set; }
     public virtual ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
-     public virtual Reservation? Reservation { get; set; }  
+    public virtual Reservation? Reservation { get; set; }  
 }

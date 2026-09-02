@@ -27,6 +27,9 @@ public class UnitOfWork : IUnitOfWork
     public IEmployeeRepository Employees {get;}
     public IMenuItemsRepository MenuItems {get;}
     public IAmenitiesRepository Amenities {get;}
+    public IRestaurantOrderRepository RestaurantOrders {get;}
+    public IRestaurantTableRepository RestaurantTables {get;}
+    public IOrderRepository Orders {get;}
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -47,6 +50,9 @@ public class UnitOfWork : IUnitOfWork
         Employees = new EmployeeRepository(_context);
         MenuItems = new MenuItemsRepository(_context);
         Preferences = new PreferenceRepository(_context);
+        RestaurantOrders = new RestaurantOrderRepository(_context);
+        RestaurantTables = new RestaurantTableRepository(_context);
+        Orders = new OrderRepository(_context);
     }
 
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();

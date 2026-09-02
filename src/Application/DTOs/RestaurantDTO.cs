@@ -119,10 +119,10 @@ public record HotelDto(
 );*/
 
 // User DTOs (referenced in the document but not defined)
-public record CreateUserDto(
+/*public record CreateUserDto(
     [Required] string Name,
     [Required] string Email,
     [Required] string Password,
     [Required] string Role
-);
+);*/
 

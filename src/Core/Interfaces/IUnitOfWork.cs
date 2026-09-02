@@ -21,7 +21,10 @@ public interface IUnitOfWork : IDisposable
     IEmployeeRepository Employees {get;}
     IMenuItemsRepository MenuItems {get;}
     IAmenitiesRepository Amenities {get;}
-
+    IOrderRepository Orders {get;}
+    IRestaurantTableRepository RestaurantTables {get;}
+    IRestaurantOrderRepository RestaurantOrders {get;}
+    
     //Task<int> SaveChangesAsync();
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

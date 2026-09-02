@@ -79,6 +79,62 @@ public class MappingProfile : Profile
         //Amenities mappings
         CreateMap<CreateAmenitiesDto, Amenities>();
         CreateMap<Amenities, AmenitiesDto>();
+
+        //Order mappings
+        CreateMap<CreateOrderItemDto, OrderItem>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.OrderId, opt => opt.Ignore())
+            .ForMember(dest => dest.Order, opt => opt.Ignore())
+            .ForMember(dest => dest.MenuItem, opt => opt.Ignore())
+            .ForMember(dest => dest.Price, opt => opt.Ignore()); // Price should be resolved from MenuItem
+
+        
+         CreateMap<UpdateOrderItemDto, OrderItem>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.OrderId, opt => opt.Ignore())
+            .ForMember(dest => dest.Order, opt => opt.Ignore())
+            .ForMember(dest => dest.MenuItem, opt => opt.Ignore())
+            .ForMember(dest => dest.MenuItemId, opt => opt.Ignore())
+            .ForMember(dest => dest.Price, opt => opt.Ignore())
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+        
+        CreateMap<OrderItem, OrderItemDto>()
+            .ForMember(dest => dest.MenuItem, opt => opt.MapFrom(src => src.MenuItem));
+
+
+        //RestaurantOrder mappings
+         CreateMap<CreateRestaurantOrderDto, RestaurantOrder>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => "New"))
+            .ForMember(dest => dest.TotalAmount, opt => opt.Ignore()) // Calculate in service
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.ReservationId, opt => opt.Ignore())
+            .ForMember(dest => dest.Table, opt => opt.Ignore())
+            .ForMember(dest => dest.Guest, opt => opt.Ignore())
+            .ForMember(dest => dest.Reservation, opt => opt.Ignore())
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+
+        CreateMap<UpdateRestaurantOrderDto, RestaurantOrder>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.TableId, opt => opt.Ignore())
+            .ForMember(dest => dest.GuestId, opt => opt.Ignore())
+            .ForMember(dest => dest.ReservationId, opt => opt.Ignore())
+            .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.Table, opt => opt.Ignore())
+            .ForMember(dest => dest.Guest, opt => opt.Ignore())
+            .ForMember(dest => dest.Reservation, opt => opt.Ignore())
+            .ForMember(dest => dest.Items, opt => opt.Ignore())
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => 
+                srcMember != null && 
+                (srcMember is not string str || !string.IsNullOrWhiteSpace(str))));
+        
+         CreateMap<RestaurantOrder, RestaurantOrderDto>()
+            .ForMember(dest => dest.Table, opt => opt.MapFrom(src => src.Table))
+            .ForMember(dest => dest.Guest, opt => opt.MapFrom(src => src.Guest))
+            .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
     
     }
 }
