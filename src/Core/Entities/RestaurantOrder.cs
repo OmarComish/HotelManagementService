@@ -9,6 +9,7 @@ public class RestaurantOrder : BaseEntity
 
     [Required]
     public int OrderTypeId { get; set; }
+    public string OrderNumber { get; set; } = string.Empty;
     public int? GuestId { get; set; }
     public int? ReservationId { get; set; }
 

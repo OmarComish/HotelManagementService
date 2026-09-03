@@ -165,12 +165,152 @@ public class DbInitializer
         {
             var ordertypes = new List<OrderType>
             {
-                new () {Id = 1, Name="Restaurant",Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"},
-                new () {Id = 2, Name="TakeAway", Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"},
-                new () {Id = 3, Name="Room-service", Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"}
+                new () {
+                    Id = 1, 
+                    Name="Restaurant",
+                    Abbreviation="RES",
+                    Status=RecordStatus.Active,
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 2, 
+                    Name="TakeAway", 
+                    Abbreviation="TAW", 
+                    Status=RecordStatus.Active, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 3, 
+                    Name="Room-service", 
+                    Abbreviation="RMS", 
+                    Status=RecordStatus.Active, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                }
             };
             context.AddRange(ordertypes);
             context.SaveChanges();
         }   
+        if(!context.MenuItems.Any())
+        {
+            var menuitems = new List<MenuItem>
+            {
+                new () {
+                    Id = 1, 
+                    HotelId = 1, 
+                    Name="Fried Rice", 
+                    Description="Wok-tossed rice with mixed vegetables, egg, and a hint of soy sauce", 
+                    Price=10.00m, 
+                    Category="Main Course", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 2, 
+                    HotelId = 1, 
+                    Name="Ice-cream", 
+                    Description="Creamy vanilla ice-cream topped with chocolate syrup and a cherry.", 
+                    Price=12.00m, 
+                    Category="Dessert", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 3, 
+                    HotelId = 1, 
+                    Name="Grilled Salmon", 
+                    Description="Fresh Atlantic salmon fillet grilled to perfection, served with lemon butter sauce and seasonal vegetables.", 
+                    Price=11.00m, 
+                    Category="Main Course", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                    },
+                new () {
+                    Id = 4, 
+                    HotelId = 1, 
+                    Name="Caesar Salad", 
+                    Description="Crisp romaine lettuce tossed with creamy Caesar dressing, parmesan cheese, and crunchy croutons.", 
+                    Price=8.00m, 
+                    Category="Appetizer", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 5, 
+                    HotelId = 1, 
+                    Name="Red Wine", 
+                    Description="A bold and smooth house red wine, perfect to accompany any meal.", 
+                    Price=7.00m, 
+                    Category="Beverage", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                 new () {
+                    Id = 6, 
+                    HotelId = 1, 
+                    Name="Vanilla Cake", 
+                    Description="Classic vanilla sponge cake with a smooth buttercream frosting and fresh berries.", 
+                    Price=5.00m, 
+                    Category="Dessert", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                  new () {
+                    Id = 7, 
+                    HotelId = 1, 
+                    Name="Chocolate Cake", 
+                    Description="Rich chocolate cake with a decadent chocolate ganache frosting and fresh strawberries.", 
+                    Price=5.50m, 
+                    Category="Dessert", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                  new () {
+                    Id = 8, 
+                    HotelId = 1, 
+                    Name="Buffalo Wings", 
+                    Description="Crispy chicken wings tossed in a spicy buffalo sauce, served with ranch dressing.", 
+                    Price=8.00m, 
+                    Category="Appetizer", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 9, 
+                    HotelId = 1, 
+                    Name="Grilled Baby Pork Ribs", 
+                    Description="Tender pork ribs slow-cooked and grilled with a smoky barbecue glaze.", 
+                    Price=8.00m, 
+                    Category="Main Course", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+                new () {
+                    Id = 10, 
+                    HotelId = 1, 
+                    Name="Nsima with Local chicken", 
+                    Description="Nsima, with Tender slow-cooked and grilled local runner chicken.", 
+                    Price=8.00m, 
+                    Category="Main Course", 
+                    IsAvailable=true, 
+                    CreatedAt = DateTime.UtcNow, 
+                    CreatedBy ="Admin"
+                },
+
+            };
+            context.AddRange(menuitems);
+            context.SaveChanges();
+        }
     }
 }

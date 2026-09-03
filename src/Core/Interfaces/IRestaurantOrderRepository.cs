@@ -5,4 +5,5 @@ public interface IRestaurantOrderRepository : IRepository<RestaurantOrder>
 {
     Task<IEnumerable<RestaurantOrder>> GetRestaurantOrdersAsync();
     Task<RestaurantOrder> GetRestaurantOrderByIdAsync(int orderId);
+    Task<int> CountRestaurantOrdersAsync(int ordertypeId);
 }

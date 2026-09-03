@@ -113,13 +113,16 @@ public class RestaurantService : IRestaurantService
             //5. Create and Save the order
             var order = _mapper.Map<RestaurantOrder>(dto);
             order.TotalAmount = totalAmount;
+            order.OrderNumber = GetOrderNumber(dto.OrderTypeId);
             order.Status = "Available";
             order.Items = orderItems;
+            order.OrderTypeId = dto.OrderTypeId;
             order.CreatedAt = DateTime.UtcNow;
             order.UpdatedAt = DateTime.UtcNow;
-            order.CreatedBy = "System"; // Replace with actual user info if available 
+            order.CreatedBy = "Admin"; // Replace with actual user info if available 
 
-            await _unitOfWork.RestaurantOrders.AddAsync(order); 
+            await _unitOfWork.RestaurantOrders.AddAsync(order);
+            await _unitOfWork.SaveChangesAsync();
 
             //6. Return mapped to DTO
             var orderDto = _mapper.Map<RestaurantOrderDto>(order);
@@ -133,5 +136,14 @@ public class RestaurantService : IRestaurantService
                 Message = "An unexpected error occurred while creating the restaurant order: " + ex.Message
             };
         }
+    }
+    private string GetOrderNumber(int orderTypeId)
+    {
+        int count = _unitOfWork.RestaurantOrders.CountRestaurantOrdersAsync(orderTypeId).Result;
+        string abbreviation = _unitOfWork.OrderTypes.GetOrderTypeByIdAsync(orderTypeId).Result.Abbreviation?.ToUpper() ?? "GEN";
+        string orderId  = $"ORD-{abbreviation}-01";
+        if(count > 0)  orderId= $"ORD-{abbreviation}-0{count + 1}";
+      
+        return orderId;
     }
 }

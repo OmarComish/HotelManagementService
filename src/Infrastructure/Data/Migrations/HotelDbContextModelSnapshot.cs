@@ -540,6 +540,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Abbreviation")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -735,6 +738,10 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
                     b.Property<int?>("GuestId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderTypeId")
                         .HasColumnType("integer");

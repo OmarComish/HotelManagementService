@@ -53,12 +53,15 @@ public record MenuItemDto(
 );
 
 // Restaurant Order DTOs
-public record CreateRestaurantOrderDto(
-    [Required] int TableId,
-    int? GuestId,
-    [Required] List<CreateOrderItemDto> Items,
-    string? SpecialInstructions
-);
+public class CreateRestaurantOrderDto
+{
+    [Required] public int TableId {get;set;}
+    public int? GuestId {get; set;}
+    [Required] public int OrderTypeId {get; set;}
+    [Required] public List<CreateOrderItemDto> Items {get; set;} = new ();
+    public string? SpecialInstructions {get; set;}
+}
+
 
 public record CreateOrderItemDto(
     [Required] int MenuItemId,
@@ -77,6 +80,7 @@ public record RestaurantOrderDto(
     int? GuestId,
     string Status,
     decimal TotalAmount,
+    string OrderNumber,
     string OrderType,
     string? SpecialInstructions,
     DateTime CreatedAt,

@@ -123,6 +123,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
+                    Abbreviation = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -569,6 +570,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TableId = table.Column<int>(type: "integer", nullable: false),
                     OrderTypeId = table.Column<int>(type: "integer", nullable: false),
+                    OrderNumber = table.Column<string>(type: "text", nullable: false),
                     GuestId = table.Column<int>(type: "integer", nullable: true),
                     ReservationId = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    [Migration("20260903124527_InitialCreate")]
+    [Migration("20260903183733_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -543,6 +543,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Abbreviation")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -738,6 +741,10 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
                     b.Property<int?>("GuestId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderTypeId")
                         .HasColumnType("integer");

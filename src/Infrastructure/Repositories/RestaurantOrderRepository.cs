@@ -20,4 +20,9 @@ public class RestaurantOrderRepository : GenericRepository<RestaurantOrder>, IRe
             .Include(o => o.Items)
             .FirstOrDefaultAsync(o => o.Id == orderId);
     }
+
+    public Task<int> CountRestaurantOrdersAsync(int ordertypeId)
+    {
+        return _context.RestaurantOrders.CountAsync(o => o.OrderTypeId == ordertypeId);
+    }
 }

@@ -1,4 +1,4 @@
-using HotelFlowAPI.Core.Interfaces;
+
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 using HotelManagementService.Infrastructure.Data;

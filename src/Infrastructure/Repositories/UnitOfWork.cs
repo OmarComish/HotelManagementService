@@ -30,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     public IRestaurantOrderRepository RestaurantOrders {get;}
     public IRestaurantTableRepository RestaurantTables {get;}
     public IOrderRepository Orders {get;}
+    public IOrderTypesRepository OrderTypes {get;}
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -53,6 +54,7 @@ public class UnitOfWork : IUnitOfWork
         RestaurantOrders = new RestaurantOrderRepository(_context);
         RestaurantTables = new RestaurantTableRepository(_context);
         Orders = new OrderRepository(_context);
+        OrderTypes = new OrderTypeRepository(_context);
     }
 
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
