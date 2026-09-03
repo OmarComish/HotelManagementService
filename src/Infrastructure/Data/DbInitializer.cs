@@ -20,7 +20,10 @@ public class DbInitializer
         {
             var hotels = new List<Hotel>
             {
-                 new(){ Id = 1, Name = "Grand Hotel", Address = "123 Main Street, CBD", CreatedAt = DateTime.UtcNow}
+                 new(){ Id = 1, Name = "Grand Hotel",City="Gaborone",Country="Botswana",
+                  Address = "123 Main Street, CBD", 
+                  CreatedAt = DateTime.UtcNow,
+                  Description ="Five-star Presidential hotel"}
             };
             context.AddRange(hotels);
             context.SaveChanges();
@@ -158,6 +161,16 @@ public class DbInitializer
             context.AddRange(tasktypes);
             context.SaveChanges();
         }
-    
+        if(!context.OrderTypes.Any())
+        {
+            var ordertypes = new List<OrderType>
+            {
+                new () {Id = 1, Name="Restaurant",Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"},
+                new () {Id = 2, Name="TakeAway", Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"},
+                new () {Id = 3, Name="Room-service", Status=RecordStatus.Active, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin"}
+            };
+            context.AddRange(ordertypes);
+            context.SaveChanges();
+        }   
     }
 }

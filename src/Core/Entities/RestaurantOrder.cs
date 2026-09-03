@@ -7,6 +7,8 @@ public class RestaurantOrder : BaseEntity
     [Required]
     public int TableId { get; set; }
 
+    [Required]
+    public int OrderTypeId { get; set; }
     public int? GuestId { get; set; }
     public int? ReservationId { get; set; }
 
@@ -22,6 +24,8 @@ public class RestaurantOrder : BaseEntity
 
     // Navigation properties
     public virtual RestaurantTable Table { get; set; } = null!;
+
+    public virtual OrderType OrderType { get; set; } = null!;
     public virtual Guest? Guest { get; set; }
     public virtual ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     public virtual Reservation? Reservation { get; set; }  

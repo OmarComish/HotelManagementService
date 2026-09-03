@@ -532,6 +532,40 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("HotelManagementService.Core.Entities.OrderType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderTypes");
+                });
+
             modelBuilder.Entity("HotelManagementService.Core.Entities.Payment", b =>
                 {
                     b.Property<int>("Id")
@@ -702,6 +736,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.Property<int?>("GuestId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("OrderTypeId")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("ReservationId")
                         .HasColumnType("integer");
 
@@ -730,6 +767,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GuestId");
+
+                    b.HasIndex("OrderTypeId");
 
                     b.HasIndex("ReservationId");
 
@@ -859,6 +898,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AmenitiesId");
+
+                    b.HasIndex("RoomTypeId");
 
                     b.ToTable("RoomAmenities");
                 });
@@ -1049,21 +1090,6 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("RoomAmenitiesRoomType", b =>
-                {
-                    b.Property<int>("AmenitiesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RoomTypesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AmenitiesId", "RoomTypesId");
-
-                    b.HasIndex("RoomTypesId");
-
-                    b.ToTable("RoomAmenitiesRoomType");
-                });
-
             modelBuilder.Entity("HotelManagementService.Core.Entities.Booking", b =>
                 {
                     b.HasOne("HotelManagementService.Core.Entities.Guest", "Guest")
@@ -1192,6 +1218,12 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .WithMany("RestaurantOrders")
                         .HasForeignKey("GuestId");
 
+                    b.HasOne("HotelManagementService.Core.Entities.OrderType", "OrderType")
+                        .WithMany("RestaurantOrders")
+                        .HasForeignKey("OrderTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HotelManagementService.Core.Entities.Reservation", "Reservation")
                         .WithMany()
                         .HasForeignKey("ReservationId");
@@ -1203,6 +1235,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Guest");
+
+                    b.Navigation("OrderType");
 
                     b.Navigation("Reservation");
 
@@ -1247,7 +1281,15 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HotelManagementService.Core.Entities.RoomType", "RoomType")
+                        .WithMany("Amenities")
+                        .HasForeignKey("RoomTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Amenities");
+
+                    b.Navigation("RoomType");
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.TaskItem", b =>
@@ -1281,21 +1323,6 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("TaskType");
-                });
-
-            modelBuilder.Entity("RoomAmenitiesRoomType", b =>
-                {
-                    b.HasOne("HotelManagementService.Core.Entities.RoomAmenities", null)
-                        .WithMany()
-                        .HasForeignKey("AmenitiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HotelManagementService.Core.Entities.RoomType", null)
-                        .WithMany()
-                        .HasForeignKey("RoomTypesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Amenities", b =>
@@ -1334,6 +1361,11 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.Navigation("OrderItems");
                 });
 
+            modelBuilder.Entity("HotelManagementService.Core.Entities.OrderType", b =>
+                {
+                    b.Navigation("RestaurantOrders");
+                });
+
             modelBuilder.Entity("HotelManagementService.Core.Entities.RestaurantOrder", b =>
                 {
                     b.Navigation("Items");
@@ -1355,6 +1387,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.RoomType", b =>
                 {
+                    b.Navigation("Amenities");
+
                     b.Navigation("Rooms");
                 });
 

@@ -9,7 +9,6 @@ public class RestaurantService : IRestaurantService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-
     public RestaurantService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
@@ -85,8 +84,7 @@ public class RestaurantService : IRestaurantService
                 Message = $"Menu items with IDs {string.Join(", ", missingIds)} not found in this hotel."};
             }
 
-            var unavailableItems = menuItems.Values.Where(mi => !mi.IsAvailable)
-            .Select(mi => mi.Name).ToList();
+            var unavailableItems = menuItems.Values.Where(mi => !mi.IsAvailable).Select(mi => mi.Name).ToList();
             
             if(unavailableItems.Any())
             {
@@ -132,7 +130,7 @@ public class RestaurantService : IRestaurantService
             return new ResponseDto 
             { 
                 Status = "error", 
-                Message = "An unexpected error occurred while creating the order." 
+                Message = "An unexpected error occurred while creating the restaurant order: " + ex.Message
             };
         }
     }

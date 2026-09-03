@@ -77,6 +77,7 @@ public record RestaurantOrderDto(
     int? GuestId,
     string Status,
     decimal TotalAmount,
+    string OrderType,
     string? SpecialInstructions,
     DateTime CreatedAt,
     RestaurantTableDto? Table = null,

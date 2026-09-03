@@ -117,6 +117,24 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Preferences",
                 columns: table => new
                 {
@@ -188,30 +206,6 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RoomAmenities",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoomTypeId = table.Column<int>(type: "integer", nullable: false),
-                    AmenitiesId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    UpdatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoomAmenities", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RoomAmenities_Amenities_AmenitiesId",
-                        column: x => x.AmenitiesId,
-                        principalTable: "Amenities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -378,6 +372,36 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RoomAmenities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoomTypeId = table.Column<int>(type: "integer", nullable: false),
+                    AmenitiesId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    UpdatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RoomAmenities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RoomAmenities_Amenities_AmenitiesId",
+                        column: x => x.AmenitiesId,
+                        principalTable: "Amenities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RoomAmenities_RoomTypes_RoomTypeId",
+                        column: x => x.RoomTypeId,
+                        principalTable: "RoomTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Rooms",
                 columns: table => new
                 {
@@ -404,30 +428,6 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     table.ForeignKey(
                         name: "FK_Rooms_RoomTypes_RoomTypeId",
                         column: x => x.RoomTypeId,
-                        principalTable: "RoomTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RoomAmenitiesRoomType",
-                columns: table => new
-                {
-                    AmenitiesId = table.Column<int>(type: "integer", nullable: false),
-                    RoomTypesId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoomAmenitiesRoomType", x => new { x.AmenitiesId, x.RoomTypesId });
-                    table.ForeignKey(
-                        name: "FK_RoomAmenitiesRoomType_RoomAmenities_AmenitiesId",
-                        column: x => x.AmenitiesId,
-                        principalTable: "RoomAmenities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RoomAmenitiesRoomType_RoomTypes_RoomTypesId",
-                        column: x => x.RoomTypesId,
                         principalTable: "RoomTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -568,6 +568,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TableId = table.Column<int>(type: "integer", nullable: false),
+                    OrderTypeId = table.Column<int>(type: "integer", nullable: false),
                     GuestId = table.Column<int>(type: "integer", nullable: true),
                     ReservationId = table.Column<int>(type: "integer", nullable: true),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
@@ -586,6 +587,12 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         column: x => x.GuestId,
                         principalTable: "Guests",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RestaurantOrders_OrderTypes_OrderTypeId",
+                        column: x => x.OrderTypeId,
+                        principalTable: "OrderTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_RestaurantOrders_Reservations_ReservationId",
                         column: x => x.ReservationId,
@@ -709,6 +716,11 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 column: "GuestId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RestaurantOrders_OrderTypeId",
+                table: "RestaurantOrders",
+                column: "OrderTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RestaurantOrders_ReservationId",
                 table: "RestaurantOrders",
                 column: "ReservationId");
@@ -729,9 +741,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 column: "AmenitiesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoomAmenitiesRoomType_RoomTypesId",
-                table: "RoomAmenitiesRoomType",
-                column: "RoomTypesId");
+                name: "IX_RoomAmenities_RoomTypeId",
+                table: "RoomAmenities",
+                column: "RoomTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_HotelId",
@@ -780,7 +792,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 name: "OrderItems");
 
             migrationBuilder.DropTable(
-                name: "RoomAmenitiesRoomType");
+                name: "RoomAmenities");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
@@ -801,7 +813,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 name: "RestaurantOrders");
 
             migrationBuilder.DropTable(
-                name: "RoomAmenities");
+                name: "Amenities");
 
             migrationBuilder.DropTable(
                 name: "Employees");
@@ -816,13 +828,13 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 name: "Guests");
 
             migrationBuilder.DropTable(
+                name: "OrderTypes");
+
+            migrationBuilder.DropTable(
                 name: "Reservations");
 
             migrationBuilder.DropTable(
                 name: "RestaurantTables");
-
-            migrationBuilder.DropTable(
-                name: "Amenities");
 
             migrationBuilder.DropTable(
                 name: "Departments");

@@ -29,6 +29,7 @@ public class HotelDbContext : DbContext
     public DbSet<Employee> Employees {get; set;}
     public DbSet<Department> Departments {get; set;}
     public DbSet<InvoiceLineItem> InvoiceLineItems {get; set;}
+    public DbSet<OrderType> OrderTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
