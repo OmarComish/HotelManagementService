@@ -192,7 +192,18 @@ public class DbInitializer
             };
             context.AddRange(ordertypes);
             context.SaveChanges();
-        }   
+        } 
+        if(!context.RestaurantTables.Any())
+        {
+            var tables = new List<RestaurantTable>
+            {
+                new () { Id = 1, HotelId = 1, TableNumber = "T1", Capacity = 4, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin" },
+                new () { Id = 2, HotelId = 1, TableNumber = "T2", Capacity = 2, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin" },
+                new () { Id = 3, HotelId = 1, TableNumber = "T3", Capacity = 6, CreatedAt = DateTime.UtcNow, CreatedBy ="Admin" }
+            };
+            context.AddRange(tables);
+            context.SaveChanges();
+        }
         if(!context.MenuItems.Any())
         {
             var menuitems = new List<MenuItem>
@@ -206,7 +217,8 @@ public class DbInitializer
                     Category="Main Course", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 25
                 },
                 new () {
                     Id = 2, 
@@ -217,7 +229,8 @@ public class DbInitializer
                     Category="Dessert", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 10
                 },
                 new () {
                     Id = 3, 
@@ -228,7 +241,8 @@ public class DbInitializer
                     Category="Main Course", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 30
                     },
                 new () {
                     Id = 4, 
@@ -239,7 +253,8 @@ public class DbInitializer
                     Category="Appetizer", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 15
                 },
                 new () {
                     Id = 5, 
@@ -250,7 +265,8 @@ public class DbInitializer
                     Category="Beverage", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 5
                 },
                  new () {
                     Id = 6, 
@@ -261,7 +277,8 @@ public class DbInitializer
                     Category="Dessert", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 25
                 },
                   new () {
                     Id = 7, 
@@ -272,7 +289,8 @@ public class DbInitializer
                     Category="Dessert", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 25
                 },
                   new () {
                     Id = 8, 
@@ -283,7 +301,8 @@ public class DbInitializer
                     Category="Appetizer", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 10
                 },
                 new () {
                     Id = 9, 
@@ -294,7 +313,8 @@ public class DbInitializer
                     Category="Main Course", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 30
                 },
                 new () {
                     Id = 10, 
@@ -305,7 +325,8 @@ public class DbInitializer
                     Category="Main Course", 
                     IsAvailable=true, 
                     CreatedAt = DateTime.UtcNow, 
-                    CreatedBy ="Admin"
+                    CreatedBy ="Admin",
+                    PrepTime = 15
                 },
 
             };

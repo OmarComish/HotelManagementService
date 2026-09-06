@@ -24,4 +24,20 @@ public class OrdersController: ControllerBase
         }
         return Ok(response);
     }
+    [HttpGet]
+    public async Task<IActionResult> GetOrders()
+    {
+        var orders = await _restaurantService.GetAllOrdersAsync();
+        return Ok(orders);
+    }
+    [HttpGet("{orderId}")]
+    public async Task<IActionResult> GetOrder(int orderId)
+    {
+        var order = await _restaurantService.GetOrderByIdAsync(orderId);
+        if(order == null)
+        {
+            return NotFound();
+        }
+        return Ok(order);
+    }
 }

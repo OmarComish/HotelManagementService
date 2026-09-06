@@ -52,4 +52,10 @@ public class InitParametersController: ControllerBase
         }
         return Ok(response);
     }
+    [HttpGet]
+    public async Task<ActionResult<OrderStatusDto>> GetAllOrderStatuses()
+    {
+        var response = await _parameterservice.GetAllOrderStatusesAsync();
+        return Ok(response);
+    }
 }

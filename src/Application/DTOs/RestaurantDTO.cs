@@ -30,7 +30,8 @@ public record CreateMenuItemDto(
     [Required] string Name,
     string? Description,
     [Required] decimal Price,
-    [Required] string Category
+    [Required] string Category,
+    int PrepTime
 );
 
 public record UpdateMenuItemDto(
@@ -49,6 +50,7 @@ public record MenuItemDto(
     decimal Price,
     string Category,
     bool IsAvailable,
+    int PrepTime,
     string? HotelName = null
 );
 
@@ -104,6 +106,12 @@ public record OrderItemDto(
     string? Notes,
     MenuItemDto? MenuItem = null
 );
+
+public class OrderStatusDto
+{
+    public int Id {get; set;}
+    public string Name {get; set;}
+}
 /*
 // Hotel DTOs (referenced in the document but not defined)
 public record CreateHotelDto(

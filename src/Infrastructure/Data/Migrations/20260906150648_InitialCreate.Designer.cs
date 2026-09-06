@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HotelManagementService.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    [Migration("20260903183733_InitialCreate")]
+    [Migration("20260906150648_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -470,6 +470,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("PrepTime")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");

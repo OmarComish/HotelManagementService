@@ -137,6 +137,26 @@ public class RestaurantService : IRestaurantService
             };
         }
     }
+
+    public async Task<IEnumerable<RestaurantOrderDto>> GetAllOrdersAsync()
+    {
+        var orders = await _unitOfWork.RestaurantOrders.GetRestaurantOrdersAsync();
+
+        var orderTypeValue = orders.FirstOrDefault()?.OrderType; // What is the type and value?
+        Console.WriteLine($"OrderType: {orderTypeValue} - Type: {orderTypeValue?.GetType()}");    
+        
+        return _mapper.Map<IEnumerable<RestaurantOrderDto>>(orders);
+    }
+
+    public async Task<RestaurantOrderDto> GetOrderByIdAsync(int orderId)
+    {
+        var order = await _unitOfWork.RestaurantOrders.GetRestaurantOrderByIdAsync(orderId);
+        if (order == null)
+        {
+            return null;
+        }
+        return _mapper.Map<RestaurantOrderDto>(order);
+    }
     private string GetOrderNumber(int orderTypeId)
     {
         int count = _unitOfWork.RestaurantOrders.CountRestaurantOrdersAsync(orderTypeId).Result;

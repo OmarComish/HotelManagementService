@@ -24,6 +24,8 @@ public class MenuItem : BaseEntity
 
     public bool IsAvailable { get; set; } = true;
 
+    public int PrepTime { get; set; } // Preparation time in minutes
+
     // Navigation properties
     public virtual Hotel Hotel { get; set; } = null!;
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

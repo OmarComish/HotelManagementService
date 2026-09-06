@@ -8,4 +8,6 @@ public interface IRestaurantService
     Task<ResponseDto> DeleteMenuItemAsync(int menuItemId);
     Task<IEnumerable<MenuItemDto>> GetMenuItemsByHotelIdAsync(int hotelId);
     Task<ResponseDto> AddOrderAsync(int hotelId, CreateRestaurantOrderDto dto);
+    Task<RestaurantOrderDto> GetOrderByIdAsync(int orderId);
+    Task<IEnumerable<RestaurantOrderDto>> GetAllOrdersAsync();
 }

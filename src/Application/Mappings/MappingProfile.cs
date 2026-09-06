@@ -111,7 +111,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.ReservationId, opt => opt.Ignore())
             .ForMember(dest => dest.Table, opt => opt.Ignore())
-            .ForMember(dest => dest.OrderType, opt => opt.Ignore())
+            .ForMember(dest => dest.OrderType, opt => opt.Ignore()) // Assuming OrderTypeId is provided in the DTO
             .ForMember(dest => dest.Guest, opt => opt.Ignore())
             .ForMember(dest => dest.Reservation, opt => opt.Ignore())
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
@@ -134,8 +134,8 @@ public class MappingProfile : Profile
                 (srcMember is not string str || !string.IsNullOrWhiteSpace(str))));
         
          CreateMap<RestaurantOrder, RestaurantOrderDto>()
+            .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType != null ? src.OrderType.Name : null))
             .ForMember(dest => dest.Table, opt => opt.MapFrom(src => src.Table))
-            .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.Name))
             .ForMember(dest => dest.Guest, opt => opt.MapFrom(src => src.Guest))
             .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
 

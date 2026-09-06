@@ -71,4 +71,14 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
     {
         return await _dbSet.FirstOrDefaultAsync(predicate);
     }
+
+    public virtual IQueryable<T> GetQueryable(Func<IQueryable<T>, IQueryable<T>> include = null)
+    {
+        IQueryable<T> query = _dbSet.AsQueryable();
+        if(include != null)
+        {
+            query = include(query);
+        }
+        return query;
+    }
 }

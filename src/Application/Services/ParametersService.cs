@@ -74,4 +74,16 @@ public class ParameterService: IParametersService
         var roomtypes = await _unitOfWork.RoomTypes.GetAllAsync();
         return _mapper.Map<IEnumerable<RoomTypeDto>>(roomtypes);
     }
+    public async Task<IEnumerable<OrderStatusDto>> GetAllOrderStatusesAsync()
+    {
+        var orderStatuses = new List<OrderStatusDto>()
+        {
+            new() {Id = (int)OrderStatus.Pending, Name = "Pending"},
+            new() {Id = (int)OrderStatus.Preparing, Name = "Preparing"},
+            new() {Id = (int)OrderStatus.Ready, Name = "Ready"},
+            new() {Id = (int)OrderStatus.Delivered, Name = "Delivered"},
+            new() {Id = (int)OrderStatus.Cancelled, Name = "Cancelled"}
+        };
+        return orderStatuses;
+    }
 }

@@ -10,7 +10,14 @@ public class RestaurantOrderRepository : GenericRepository<RestaurantOrder>, IRe
 
     public async Task<IEnumerable<RestaurantOrder>> GetRestaurantOrdersAsync()
     {
-        return await _context.RestaurantOrders.ToListAsync();
+        return await _context.RestaurantOrders.Include(o => o.Table)
+            .Include(o =>o.OrderType)
+            .Include(o => o.Table.Hotel)
+            .Include(o =>o.Guest)
+            .Include(o => o.Items)
+            .ThenInclude(i =>i.MenuItem)
+            .ThenInclude(m => m.Hotel)
+            .ToListAsync();
     }
 
     public async Task<RestaurantOrder> GetRestaurantOrderByIdAsync(int orderId)
