@@ -35,4 +35,13 @@ public class RoomRepository : GenericRepository<Room>, IRoomRepository
             .Include(r => r.Hotel)
             .FirstOrDefaultAsync(r => r.Id == id);
     }
+    public async Task<Room> GetByRoomTypeWithDetailsAsync(int HotelId, int roomTypeId, DateTime checkIn, DateTime checkOut)
+    {
+        return await _context.Rooms
+            .Include(r => r.RoomType)
+            .Include(r => r.RoomType.Price)
+            .Include(r => r.Hotel)
+            .FirstOrDefaultAsync(r => r.HotelId == HotelId && 
+            r.RoomTypeId == roomTypeId && r.Status == RecordStatus.Available);
+    }
 }

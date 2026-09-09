@@ -23,5 +23,15 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
             .ThenInclude(rt => rt.Amenities)
         .Include(r =>r.Room)
         .ThenInclude(r =>r.Hotel);
+
+    public async Task<Reservation> GetCurrentReservationByRoomNumberAsync(string roomNumber)
+    {
+        var response = await( from reservation in _context.Reservations
+            join room in _context.Rooms on reservation.RoomId equals room.Id
+            where room.RoomNumber == roomNumber && reservation.Status == ReservationStatuses.CheckedIn
+            select reservation).FirstOrDefaultAsync();
+        
+        return response;
+    }
     
 }

@@ -81,4 +81,8 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
         }
         return query;
     }
+    public virtual IQueryable<T> Query()
+    {
+        return _dbSet.AsQueryable();
+    }
 }

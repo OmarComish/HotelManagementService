@@ -193,6 +193,18 @@ public class DbInitializer
             context.AddRange(ordertypes);
             context.SaveChanges();
         } 
+        if(!context.Guests.Any())
+        {
+            var guests = new List<Guest>
+            {
+                new () { Id = 1, FirstName = "Walk-in", 
+                LastName = "Walk-in", 
+                PhoneNumber="0999123987",
+                Email = "alice.smith@example.com", Notes = "Walk-in guest used as generic customer for making orders in restaurant" },
+            };
+            context.AddRange(guests);
+            context.SaveChanges();
+        }
         if(!context.RestaurantTables.Any())
         {
             var tables = new List<RestaurantTable>
