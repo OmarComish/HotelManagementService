@@ -21,52 +21,76 @@ public class ReservationService : IReservationService
 
     public async Task<ResponseDto> CreateReservation(CreateReservationDto createReservationDto)
     {
+        //this workflow is missing Adding of a guest first before creating a reservation
+        //once adding guest is successful, add the reservation
         var response = new ResponseDto{Status ="error", Message="Failed to create reservation"};
         try
         {
-            //validate room exists and is available
-            var room = await _unitOfWork.Rooms.GetByIdAsync(createReservationDto.RoomId);
+
+            //Add guest details first
+            var guestDto = new CreateGuestDto
+            {
+                FirstName = createReservationDto.FirstName,
+                LastName = createReservationDto.LastName,
+                IDNumber = createReservationDto.IdNumber,
+                PhoneNumber = createReservationDto.Phone,
+                Email = createReservationDto.Email,
+                PreferenceIds = createReservationDto.PreferenceIds,
+            };
             
-            if (room == null)
+            response = await AddGuest(guestDto);
+
+            if(response.Status =="success")
             {
-                response.Message ="Room not found";
-                return response;
-            }
+                //validate room exists and is available
+                var room = await _unitOfWork.Rooms.GetByIdAsync(createReservationDto.RoomId);
                 
-            //check for conflicts
-            var hasConflict = await HasReservationConflictAsync(
-                createReservationDto.RoomId,
-                createReservationDto.CheckIn,
-                createReservationDto.CheckOut);
+                if (room == null)
+                {
+                    response.Message ="Room not found";
+                    return response;
+                }
+                    
+                //check for conflicts
+                var hasConflict = await HasReservationConflictAsync(
+                    createReservationDto.RoomId,
+                    createReservationDto.CheckIn,
+                    createReservationDto.CheckOut);
 
-            if (hasConflict)
+                if (hasConflict)
+                {
+                    response.Message ="Room is not available for the selected dates";
+                    return response;
+                }
+                    
+                var reservation = _mapper.Map<Reservation>(createReservationDto);
+
+                // Calculate total amount
+                var nights = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;
+                var roomType = await _unitOfWork.RoomTypes.GetByIdAsync(room.RoomTypeId);
+                reservation.TotalAmount = nights * roomType.Price;
+
+
+                var createdreservation = await _unitOfWork.Reservations.AddAsync(reservation);
+                //await _unitOfWork.SaveChangesAsync();
+
+                //Change the room status to reserved
+                room.Status = room.Status== RecordStatus.Available? RecordStatus.Reserved: room.Status;
+                var roomstatuschange = await _unitOfWork.Rooms.UpdateAsync(room);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                response.Status ="success";
+                response.Message = "Reservation created successfully";
+
+                // _logger.LogInformation("Reservation created successfully with ID: {ReservationId}", createdreservation.Id);
+                response.Payload = _mapper.Map<ReservationDto>(createdreservation);
+            } 
+            else
             {
-                response.Message ="Room is not available for the selected dates";
-                return response;
+                response.Message = "Failed to create reservation";
             }
-                
-            var reservation = _mapper.Map<Reservation>(createReservationDto);
 
-            // Calculate total amount
-            var nights = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;
-            var roomType = await _unitOfWork.RoomTypes.GetByIdAsync(room.RoomTypeId);
-            reservation.TotalAmount = nights * roomType.Price;
-
-
-            var createdreservation = await _unitOfWork.Reservations.AddAsync(reservation);
-              //await _unitOfWork.SaveChangesAsync();
-
-             //Change the room status to reserved
-             room.Status = room.Status== RecordStatus.Available? RecordStatus.Reserved: room.Status;
-             var roomstatuschange = await _unitOfWork.Rooms.UpdateAsync(room);
-
-             await _unitOfWork.SaveChangesAsync();
-
-              response.Status ="success";
-              response.Message = "Reservation created successfully";
-
-            // _logger.LogInformation("Reservation created successfully with ID: {ReservationId}", createdreservation.Id);
-            response.Payload = _mapper.Map<ReservationDto>(createdreservation);
             
         }
         catch (Exception ex)
@@ -250,5 +274,39 @@ public class ReservationService : IReservationService
              (checkIn <= b.CheckIn && checkOut >= b.CheckOut)));
 
         return conflictingReservations.Any();
+    }
+
+    private async Task<ResponseDto> AddGuest(CreateGuestDto createGuestDto)
+    {
+
+        var response = new ResponseDto { Status = "error", Message = "Failed to add guest information" };
+        //Step 1: Map basic Guest fields
+        var guest = _mapper.Map<Guest>(createGuestDto);
+
+        //Step 2: Save to database
+        var createdGuest = await _unitOfWork.Guests.AddAsync(guest);
+        await _unitOfWork.SaveChangesAsync();
+        
+        response.Status ="success";
+        response.Message = $"Adding guest data for {createGuestDto.FirstName} successful";
+
+        //Step 3: Add Guest Preferences if any
+         Console.WriteLine("preference IDS data");
+         Console.WriteLine(createGuestDto.PreferenceIds);
+        if(createGuestDto.PreferenceIds != null && createGuestDto.PreferenceIds.Any())
+        {
+            Console.WriteLine("Adding Preferences...");
+            Console.Write(createGuestDto.PreferenceIds );
+            var preferences = createGuestDto.PreferenceIds
+            .Select(id =>new GuestPreferences
+            {
+                GuestId = createdGuest.Id,
+                PreferenceId = id
+            }).ToList();
+
+            await _unitOfWork.GuestPreferences.AddRangeAsync(preferences);
+            await _unitOfWork.SaveChangesAsync();
+        }
+        return response;
     }
 }

@@ -6,5 +6,5 @@ public interface IReservationRepository: IRepository<Reservation>
 {
    Task<Reservation?> GetWithRoomDetailsByIdAsync(int id);
    Task<IEnumerable<Reservation?>> GetWithRoomDetailsAsync();
-
+   Task<Reservation> GetCurrentReservationByRoomNumberAsync(string roomNumber);
 }

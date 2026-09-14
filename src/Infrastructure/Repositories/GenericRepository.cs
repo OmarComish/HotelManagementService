@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 using HotelManagementService.Infrastructure.Data;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementService.Infrastructure.Repositories;
@@ -72,12 +73,12 @@ public class GenericRepository<T> : IRepository<T> where T : BaseEntity
         return await _dbSet.FirstOrDefaultAsync(predicate);
     }
 
-    public virtual IQueryable<T> GetQueryable(Func<IQueryable<T>, IQueryable<T>> include = null)
+    public virtual IQueryable<T> GetQueryable(Func<IQueryable<T>, IQueryable<T>> queryBuilder = null)
     {
         IQueryable<T> query = _dbSet.AsQueryable();
-        if(include != null)
+        if(queryBuilder != null)
         {
-            query = include(query);
+            query = queryBuilder(query);
         }
         return query;
     }

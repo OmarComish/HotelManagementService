@@ -100,6 +100,21 @@ public class RoomsController : ControllerBase
         var rooms = await _roomService.GetAvailableRoomsAsync(hotelId, checkIn, checkOut);
         return Ok(rooms);
     }
+    [HttpGet("available-by-type")]
+    [ProducesResponseType(typeof(IEnumerable<RoomDto>), 200)]
+    [ProducesResponseType(400)]
+    public async Task<ActionResult<IEnumerable<RoomDto>>> GetAvailableRoomsByType(
+        [FromQuery] int hotelId,
+        [FromQuery] int roomTypeId,
+        [FromQuery] DateTime checkIn,
+        [FromQuery] DateTime checkOut)
+    {
+        if (checkIn >= checkOut)
+            return BadRequest("Check-in date must be before check-out date");
+
+        var rooms = await _roomService.GetAvailableRoomsByTypeAsync(hotelId, roomTypeId, checkIn, checkOut);
+        return Ok(rooms);
+    }
 
     /// <summary>
     /// Updates a room

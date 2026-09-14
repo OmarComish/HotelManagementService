@@ -3,14 +3,17 @@ using System.ComponentModel.DataAnnotations;
 namespace HotelManagementService.Application.DTOs;
 public record CreateReservationDto(
     [Required] int RoomId,
-    [Required] string GuestName,
+    [Required] string FirstName,
+    [Required] string LastName,
     [Required] string Email,
     string ReservationSource,
     string SpecialRequests,
-    string Phone,   
+    string Phone,
+    string IdNumber,   
     [Required] DateTime CheckIn,
     [Required] DateTime CheckOut,
-    [Required] int Guests
+    [Required] int Guests,
+    List<int> PreferenceIds = null 
 );
 public record ReservationDto(
     int Id,

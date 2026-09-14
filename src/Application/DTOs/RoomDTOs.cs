@@ -17,16 +17,16 @@ public record UpdateRoomDto(
     string? Status
 );
 
-public record RoomDto
+public class RoomDto
 {
-     public int Id {get; init;}
-     public int HotelId {get; init;}
-     public string RoomNumber {get; init;}
-     public string Type {get; init;} 
-     public decimal Price {get; init;}
-     public string Status {get; init;}
+     public int Id {get; set;}
+     public int HotelId {get; set;}
+     public string RoomNumber {get; set;}
+     public string Type {get; set;} 
+     public decimal Price {get; set;}
+     public string Status {get; set;}
      public IEnumerable<AmenitiesDto> Amenitieslist {get; set;} = new List<AmenitiesDto>();
-     public string? HotelName { get; init; }
+     public string? HotelName { get; set; }
      
 }
  

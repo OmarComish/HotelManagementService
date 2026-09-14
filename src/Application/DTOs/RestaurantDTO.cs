@@ -62,6 +62,8 @@ public class CreateRestaurantOrderDto
     [Required] public int OrderTypeId {get; set;}
     [Required] public List<CreateOrderItemDto> Items {get; set;} = new ();
     public string? SpecialInstructions {get; set;}
+    public string? Priority {get; set;} = "Normal";
+    public string PaymentMethod {get; set;} = "Charge to room"; // e.g., Cash, Card, Charge to room, etc.
 }
 
 

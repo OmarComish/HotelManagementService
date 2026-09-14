@@ -62,15 +62,22 @@ public class RestaurantService : IRestaurantService
                 return new ResponseDto { Status = "error", Message = $"Table with ID {dto.TableId} not found in this hotel."};
             }
 
-            //2. Validate Guest belongs to hotel
+            //2. Validate Guest belongs to hotel or provide a default guest if not provided
             if(dto.GuestId.HasValue)
             {
                 var guest = await _unitOfWork.GuestPreferences.GetByIdWithDetailsAsync(dto.GuestId.Value);//(g=>g.Id==dto.GuestId.Value);//GetByIdWithDetailsAsync(dto.GuestId.Value);
                 if (guest == null )//|| guest.HotelId != hotelId || guest.Status != "Approved")
                 {
-                    return new ResponseDto { Status = "error", 
-                    Message = $"Guest with ID {dto.GuestId} is not approved or does not belong to this hotel."};
+                     // Provide a default guest if none is specified
+                    dto.GuestId = 1; // Assuming the default guest has ID 1
+                    //return new ResponseDto { Status = "error", 
+                    //Message = $"Guest with ID {dto.GuestId} is not approved or does not belong to this hotel."};
                 }
+            }
+            else
+            {
+                // Provide a default guest if none is specified
+                dto.GuestId = 1; // Assuming the default guest has ID 1
             }
             //3. Validate menuitem exists and belongs to hotel
             var menuItemIds = dto.Items.Select(i => i.MenuItemId).ToList();

@@ -138,4 +138,9 @@ public class GuestService :  IGuestService
 
         return true;
     }
+    public async Task<ReservationDto> GetCurrentReservationByGuestIdAsync(string roomNumber)
+    {
+        var reservation = await _unitOfWork.Reservations.GetCurrentReservationByRoomNumberAsync(roomNumber);
+        return reservation!=null ? _mapper.Map<ReservationDto>(reservation) : null;
+    }
 }

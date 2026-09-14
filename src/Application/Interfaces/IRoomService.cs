@@ -8,6 +8,7 @@ public interface IRoomService
     Task<IEnumerable<RoomDto>> GetAllRoomsAsync();
     Task<IEnumerable<RoomDto>> GetRoomsByHotelIdAsync(int hotelId);
     Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(int hotelId, DateTime checkIn, DateTime checkOut);
+    Task<IEnumerable<RoomDto>> GetAvailableRoomsByTypeAsync(int hotelId, int roomTypeId, DateTime checkIn, DateTime checkOut);
     Task<RoomDto> UpdateRoomAsync(int id, UpdateRoomDto updateRoomDto);
     Task<bool> DeleteRoomAsync(int id);
 }

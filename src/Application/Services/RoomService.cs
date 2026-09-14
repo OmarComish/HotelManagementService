@@ -3,6 +3,8 @@ using HotelManagementService.Application.DTOs;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 
+
+
 namespace HotelManagementService.Application.Services;
 public class RoomService : IRoomService
 {
@@ -67,7 +69,52 @@ public class RoomService : IRoomService
       
         return _mapper.Map<IEnumerable<RoomDto>>(rooms);
     }
+    
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsByTypeAsync(
+        int hotelId,
+        int roomTypeId,
+        DateTime checkIn,
+        DateTime checkOut)
+    {
+        checkIn = DateTime.SpecifyKind(checkIn,DateTimeKind.Utc);
+        checkOut = DateTime.SpecifyKind(checkOut, DateTimeKind.Utc);
 
+        if (checkOut <= checkIn)
+        {
+        throw new ArgumentException(
+            "Check-out date must be later than check-in date.");
+        }
+
+        var rooms = await _unitOfWork.Rooms.FindAsync(
+            r => r.HotelId == hotelId
+                && r.RoomTypeId == roomTypeId
+                && r.Status == RecordStatus.Available);
+
+        if (rooms == null || !rooms.Any())
+        {
+            return Enumerable.Empty<RoomDto>();
+        }
+
+        var availableRooms = new List<Room>();
+
+        foreach (var room in rooms)
+        {
+            var hasConflict = await HasBookingConflictAsync(
+                room.Id,
+                checkIn,
+                checkOut);
+
+            if (!hasConflict)
+            {
+                availableRooms.Add(room);
+            }
+        }
+
+        var roomsFound = _mapper.Map<List<RoomDto>>(availableRooms);
+        var rs = await PopulateRoomPriceAsync(roomsFound);
+
+        return rs;
+    }
     public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(int hotelId, DateTime checkIn, DateTime checkOut)
     {
         var allRooms = await _unitOfWork.Rooms.FindAsync(r => r.HotelId == hotelId && r.Status == RecordStatus.Available);
@@ -137,5 +184,19 @@ public class RoomService : IRoomService
              (checkIn <= b.CheckIn && checkOut >= b.CheckOut)));
 
         return conflictingBookings.Any();
+    }
+    private async Task<List<RoomDto>> PopulateRoomPriceAsync(List<RoomDto> dto)
+    {
+        for(int r = 0; r < dto.Count; r ++)
+        {
+            
+            var roomType = await _unitOfWork.RoomTypes.FirstOrDefaultAsync(m =>m.Id == dto[r].Id);
+            
+            if(roomType!= null)
+            {
+                dto[r].Price = roomType.Price;
+            }
+        }
+        return dto;
     }
 }

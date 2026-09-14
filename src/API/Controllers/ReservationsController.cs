@@ -4,15 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HotelFlowAPI.API.Controllers;
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]")]
 public class ReservationsController: ControllerBase
 {
     private readonly IReservationService _reservationService;
-    private readonly IInvoiceService _invoiceService; 
-    public ReservationsController(IReservationService reservationService, IInvoiceService invoiceService)
+    private readonly IInvoiceService _invoiceService;
+    private readonly IGuestService _guestService; 
+    public ReservationsController(IReservationService reservationService, IInvoiceService invoiceService, IGuestService guestService)
     {
         _reservationService = reservationService;
         _invoiceService = invoiceService;
+        _guestService = guestService;
     }
     [HttpPost]
     public async Task<ActionResult<ResponseDto>> CreateReservation(CreateReservationDto createReservationDto)
@@ -25,13 +27,13 @@ public class ReservationsController: ControllerBase
         }
         return Ok(response);
     }
-    [HttpGet]
+    [HttpGet("all")]
     public async Task<ActionResult<ReservationDto>> GetReservations()
     {
         var response = await _reservationService.GetAllReservations();
         return Ok(response);
     }
-    [HttpPut]
+    [HttpPut("update")]
     public async Task<ActionResult> UpdateReservation(UpdateReservationDto updatereservationDto)
     {
         var response = new ResponseDto{Status ="error", Message = BadRequest("Could not save the changes").ToString()};
@@ -46,7 +48,7 @@ public class ReservationsController: ControllerBase
         }
         return Ok(response);
     }
-    [HttpPut]
+    [HttpPut("checkin")]
     public async Task<ActionResult> CheckIn(CheckInDto dto)
     {
          var response = new ResponseDto{Status ="error", Message = BadRequest("Check-in failed.").ToString()};
@@ -66,5 +68,18 @@ public class ReservationsController: ControllerBase
         }
          //4. render results
         return Ok(response);
+    }
+    /*[HttpPost("walkin-checkin")]
+    public async Task<ActionResult<ResponseDto>> WalkinCheckin()
+    {
+        //TODO
+        //1. Create an appropriate DTO
+        //2. Implement the correct workflow (Guest -> Reservation -> Checkin)
+    }*/
+    [HttpGet("{roomNumber}")]
+    public async Task<ActionResult<ReservationDto>> GetCurrentReservationByRoomNumber(string roomNumber)
+    {
+        var reservation = await _guestService.GetCurrentReservationByGuestIdAsync(roomNumber);
+        return Ok(reservation);
     }
 }

@@ -22,6 +22,8 @@ public class RestaurantOrder : BaseEntity
 
     [MaxLength(500)]
     public string? SpecialInstructions { get; set; }
+    public string? Priority { get; set; } = "Normal";
+    public string PaymentMethod { get; set; } = "Charge to room"; // e.g., Cash, Card, Charge to room, etc.
 
     // Navigation properties
     public virtual RestaurantTable Table { get; set; } = null!;

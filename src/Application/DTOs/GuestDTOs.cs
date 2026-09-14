@@ -15,7 +15,6 @@ public record CreateGuestDto {
     public string Email {get;init;}
     public string Notes {get;init;}
     public List<int> PreferenceIds {get;init;} // list of selected preferences
-    //CreateBookingDto? Booking = null //optional booking
 }
 
 public record UpdateGuestDto(

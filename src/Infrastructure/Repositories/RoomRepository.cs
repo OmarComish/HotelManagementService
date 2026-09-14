@@ -1,6 +1,7 @@
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 using HotelManagementService.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelManagementService.Infrastructure.Repositories;
@@ -37,11 +38,12 @@ public class RoomRepository : GenericRepository<Room>, IRoomRepository
     }
     public async Task<Room> GetByRoomTypeWithDetailsAsync(int HotelId, int roomTypeId, DateTime checkIn, DateTime checkOut)
     {
-        return await _context.Rooms
-            .Include(r => r.RoomType)
-            .Include(r => r.RoomType.Price)
+        var result =  await _context.Rooms
+            .Include(r => r.RoomType)  
             .Include(r => r.Hotel)
-            .FirstOrDefaultAsync(r => r.HotelId == HotelId && 
+            .FirstOrDefaultAsync(r => r.HotelId == HotelId &&
             r.RoomTypeId == roomTypeId && r.Status == RecordStatus.Available);
+
+        return result;
     }
 }
