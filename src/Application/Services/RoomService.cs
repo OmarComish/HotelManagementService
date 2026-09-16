@@ -37,9 +37,13 @@ public class RoomService : IRoomService
         
           // Set default status
         room.Status = RecordStatus.Available; 
-      
+
         var createdRoom = await _unitOfWork.Rooms.AddAsync(room);
         await _unitOfWork.SaveChangesAsync();
+
+        Console.WriteLine($"Room ID:::::::::: {room.Id}");
+        Console.WriteLine($"Room Number:::::::::: {room.RoomNumber}");
+        Console.WriteLine($"Room Type:::::::::: {room.RoomType}");
 
         //_logger.LogInformation("Room created successfully with ID: {RoomId}", createdRoom.Id);
 

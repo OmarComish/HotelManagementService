@@ -488,7 +488,7 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     RoomId = table.Column<int>(type: "integer", nullable: false),
-                    GuestName = table.Column<string>(type: "text", nullable: false),
+                    GuestId = table.Column<int>(type: "integer", nullable: false),
                     CheckIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CheckOut = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", maxLength: 20, nullable: false),
@@ -506,6 +506,12 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reservations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reservations_Guests_GuestId",
+                        column: x => x.GuestId,
+                        principalTable: "Guests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Rooms_RoomId",
                         column: x => x.RoomId,
@@ -711,6 +717,11 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 column: "InvoiceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reservations_GuestId",
+                table: "Reservations",
+                column: "GuestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_RoomId",
                 table: "Reservations",
                 column: "RoomId");
@@ -830,9 +841,6 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                 name: "Invoices");
 
             migrationBuilder.DropTable(
-                name: "Guests");
-
-            migrationBuilder.DropTable(
                 name: "OrderTypes");
 
             migrationBuilder.DropTable(
@@ -843,6 +851,9 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Departments");
+
+            migrationBuilder.DropTable(
+                name: "Guests");
 
             migrationBuilder.DropTable(
                 name: "Rooms");

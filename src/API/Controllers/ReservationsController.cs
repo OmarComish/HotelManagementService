@@ -20,9 +20,10 @@ public class ReservationsController: ControllerBase
     public async Task<ActionResult<ResponseDto>> CreateReservation(CreateReservationDto createReservationDto)
     {
         var response = new ResponseDto { Status = "error", Message = BadRequest().ToString() };
+        Console.WriteLine($"{createReservationDto}");
         if (createReservationDto != null)
         {
-            Console.WriteLine($"{createReservationDto}");
+            
             response = await _reservationService.CreateReservation(createReservationDto);
         }
         return Ok(response);

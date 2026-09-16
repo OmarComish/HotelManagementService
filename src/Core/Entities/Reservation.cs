@@ -8,7 +8,7 @@ public class Reservation : BaseEntity
     public int RoomId { get; set; }
 
     [Required]
-    public string? GuestName { get; set; }
+    public int GuestId { get; set; }
 
     [Required]
     public DateTime CheckIn { get; set; }
@@ -38,8 +38,9 @@ public class Reservation : BaseEntity
     public int Guests { get; set; }
 
     // Navigation properties
+    
     public virtual Room Room { get; set; } = null!;
-    //public virtual Guest Guest { get; set; } = null!;
+    public virtual Guest Guest { get; set; } = null!;
     //public virtual Payment? Payment { get; set; }
     //public virtual Invoice? Invoice { get; set; }
 }

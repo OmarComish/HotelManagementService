@@ -19,7 +19,8 @@ public class MappingProfile : Profile
         //Reservations mapping
         CreateMap<CreateReservationDto, Reservation>();
         CreateMap<Reservation, ReservationDto>()
-           .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room));
+           .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room))
+           .ForMember(dest => dest.GuestName, opt => opt.MapFrom(src =>src.Guest!= null ? $"{src.Guest.FirstName} {src.Guest.LastName}": null));
 
         //Reservation
         CreateMap<CreateRoomDto, Room>();

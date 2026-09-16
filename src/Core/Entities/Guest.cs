@@ -32,6 +32,7 @@ public class Guest : BaseEntity
     public string? Notes { get; set; }
 
     // Navigation properties
+    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public virtual ICollection<RestaurantOrder> RestaurantOrders { get; set; } = new List<RestaurantOrder>();
     public virtual ICollection<GuestPreferences> GuestPreferences { get; set; } = new List<GuestPreferences>();

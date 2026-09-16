@@ -38,16 +38,17 @@ public class ReservationService : IReservationService
                 PreferenceIds = createReservationDto.PreferenceIds,
             };
             
-            response = await AddGuest(guestDto);
+            int guestId = await AddGuest(guestDto);
 
-            if(response.Status =="success")
+            if(guestId != 0)
             {
                 //validate room exists and is available
                 var room = await _unitOfWork.Rooms.GetByIdAsync(createReservationDto.RoomId);
                 
                 if (room == null)
                 {
-                    response.Message ="Room not found";
+                    response.Status = "error";
+                    response.Message ="Reservation failed. Room not found";
                     return response;
                 }
                     
@@ -62,8 +63,15 @@ public class ReservationService : IReservationService
                     response.Message ="Room is not available for the selected dates";
                     return response;
                 }
-                    
+                
                 var reservation = _mapper.Map<Reservation>(createReservationDto);
+
+               //Assign the Foreign Key Guest ID to link Guest with their Reservation
+             
+                reservation.GuestId = guestId;
+
+                //Assign status
+                reservation.Status = ReservationStatuses.Reserved;
 
                 // Calculate total amount
                 var nights = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;
@@ -143,8 +151,8 @@ public class ReservationService : IReservationService
         }
 
 
-        if (reservationdto.GuestName != null)
-            reservation.GuestName = reservationdto.GuestName;
+       /* if (reservationdto.GuestId != null)
+            reservation.GuestId = reservationdto.GuestName;*/
 
         if (reservationdto.RoomId.HasValue && reservationdto.RoomId.Value != 0)
             reservation.RoomId = reservationdto.RoomId.Value;
@@ -200,15 +208,33 @@ public class ReservationService : IReservationService
         // Recalculate total amount
         var room = await _unitOfWork.Rooms.GetByIdAsync(reservation.RoomId);
         reservation.TotalAmount = await CalculateRoomCost(reservation.CheckIn, reservation.CheckOut, room.RoomTypeId);
+        
+        bool roomstatuschanged = await ChangeRoomStatus(RecordStatus.Occupied, reservation.RoomId);
 
-        await _unitOfWork.Reservations.UpdateAsync(reservation);
-        await _unitOfWork.SaveChangesAsync();
+        if(roomstatuschanged)
+        {
+            await _unitOfWork.Reservations.UpdateAsync(reservation);
+            await _unitOfWork.SaveChangesAsync();
 
-        response.Status = "success";
-        response.Message = $"Check-in for guest {reservation.GuestName} successful";
-        response.Payload = reservation;
-
+            response.Status = "success";
+            response.Message = $"Check-in for guest {reservation.GuestId} successful";
+            response.Payload = reservation;
+        }
+        
         return response;
+    }
+    private async Task<bool> ChangeRoomStatus(RecordStatus status, int roomId)
+    {
+        bool success = false;
+        var room = await _unitOfWork.Rooms.GetByIdAsync(roomId);
+        if(room != null)
+        {
+            room.Status = status;
+            await _unitOfWork.Rooms.UpdateAsync(room);
+            await _unitOfWork.SaveChangesAsync();
+            success = true;
+        }
+        return success;
     }
     public async Task<ResponseDto> CheckInII(CheckInDto dto)
     {
@@ -250,7 +276,7 @@ public class ReservationService : IReservationService
         
 
         response.Status ="success";
-        response.Message =$"Check-in for guest {reservation.GuestName} successful";
+        response.Message =$"Check-in for guest {reservation.GuestId} successful";
         response.Payload = reservation; //_mapper.Map<ReservationDto>(reservation);
 
         return response;
@@ -275,38 +301,63 @@ public class ReservationService : IReservationService
 
         return conflictingReservations.Any();
     }
-
-    private async Task<ResponseDto> AddGuest(CreateGuestDto createGuestDto)
+    private async Task<int> AddGuest(CreateGuestDto createGuestDto)
     {
 
-        var response = new ResponseDto { Status = "error", Message = "Failed to add guest information" };
-        //Step 1: Map basic Guest fields
-        var guest = _mapper.Map<Guest>(createGuestDto);
-
-        //Step 2: Save to database
-        var createdGuest = await _unitOfWork.Guests.AddAsync(guest);
-        await _unitOfWork.SaveChangesAsync();
-        
-        response.Status ="success";
-        response.Message = $"Adding guest data for {createGuestDto.FirstName} successful";
-
-        //Step 3: Add Guest Preferences if any
-         Console.WriteLine("preference IDS data");
-         Console.WriteLine(createGuestDto.PreferenceIds);
-        if(createGuestDto.PreferenceIds != null && createGuestDto.PreferenceIds.Any())
+        //var response = new ResponseDto { Status = "error", Message = "Failed to add guest information" };
+        int guestId = 0;
+        try
         {
-            Console.WriteLine("Adding Preferences...");
-            Console.Write(createGuestDto.PreferenceIds );
-            var preferences = createGuestDto.PreferenceIds
-            .Select(id =>new GuestPreferences
+            //Step 1: Check if Guest already exist
+            var existingGuest = await _unitOfWork.Guests.FirstOrDefaultAsync(g=>
+            (!string.IsNullOrEmpty(createGuestDto.IDNumber) && g.IDNumber == createGuestDto.IDNumber)
+            || (!string.IsNullOrEmpty(createGuestDto.PhoneNumber) && g.PhoneNumber == createGuestDto.PhoneNumber)
+            || (!string.IsNullOrEmpty(createGuestDto.Email) && g.Email == createGuestDto.Email));
+           
+            if(existingGuest!=null)
             {
-                GuestId = createdGuest.Id,
-                PreferenceId = id
-            }).ToList();
+                return guestId = existingGuest.Id;
+            }
 
-            await _unitOfWork.GuestPreferences.AddRangeAsync(preferences);
+            //Step 2: Map basic Guest fields
+            var guest = _mapper.Map<Guest>(createGuestDto);
+
+            Console.WriteLine($"Guest debug info========================== {guest.Id}");
+
+            //Step 2: Save to database
+            var createdGuest = await _unitOfWork.Guests.AddAsync(guest);
             await _unitOfWork.SaveChangesAsync();
+            
+            //response.Status ="success";
+            //response.Message = $"Adding guest data for {createGuestDto.FirstName} successful";
+            //response.Payload = createdGuest.Id;
+
+             guestId = createdGuest.Id;
+
+            //Step 3: Add Guest Preferences if any
+            Console.WriteLine("preference IDS data");
+            Console.WriteLine(createGuestDto.PreferenceIds);
+
+            if(createGuestDto.PreferenceIds != null && createGuestDto.PreferenceIds.Any())
+            {
+                Console.WriteLine("Adding Preferences...");
+                Console.Write(createGuestDto.PreferenceIds );
+                var preferences = createGuestDto.PreferenceIds
+                .Select(id =>new GuestPreferences
+                {
+                    GuestId = createdGuest.Id,
+                    PreferenceId = id
+                }).ToList();
+
+                await _unitOfWork.GuestPreferences.AddRangeAsync(preferences);
+                await _unitOfWork.SaveChangesAsync();
+            }
         }
-        return response;
+        catch( Exception e)
+        {
+            Console.WriteLine(e.InnerException?.Message);
+        }
+ 
+        return guestId;
     }
 }

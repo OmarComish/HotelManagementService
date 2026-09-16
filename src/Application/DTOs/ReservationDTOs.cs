@@ -15,22 +15,25 @@ public record CreateReservationDto(
     [Required] int Guests,
     List<int> PreferenceIds = null 
 );
-public record ReservationDto(
-    int Id,
-    int RoomId,
-    string GuestName,
-    DateTime CheckIn,
-    DateTime CheckOut,
-    string Status,
-    string ReservationSource,
-    string SpecialRequests,
-    string Phone,
-    decimal TotalAmount,
-    string Email,
-    int Guests,
-    DateTime CreatedAt,
-    RoomDto? Room = null
-);
+public class ReservationDto
+{
+   
+    public int Id {get; set;}
+    public int RoomId {get; set;}
+    public string GuestName {get; set;}
+    public DateTime CheckIn {get; set;}
+    public DateTime CheckOut {get; set;}
+    public string Status {get; set;}
+    public string ReservationSource {get; set;}
+    public string SpecialRequests {get; set;}
+    public string Phone {get; set;}
+    public decimal TotalAmount {get; set;}
+    public string Email {get; set;}
+    public int Guests {get; set;}
+    public DateTime CreatedAt {get; set;}
+    public RoomDto? Room {get; set;} = null;
+
+}
 /*public record UpdateReservationDto(
     int Id,
     int? RoomId,

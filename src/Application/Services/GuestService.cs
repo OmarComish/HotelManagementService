@@ -127,7 +127,7 @@ public class GuestService :  IGuestService
 
         // Check if guest has active bookings
         var activeBookings = await _unitOfWork.Reservations.FindAsync(b =>
-            b.GuestName == guest.FirstName && (b.Status == ReservationStatuses.Reserved 
+            b.GuestId == guest.Id && (b.Status == ReservationStatuses.Reserved 
             || b.Status == ReservationStatuses.CheckedIn));
 
         if (activeBookings.Any())

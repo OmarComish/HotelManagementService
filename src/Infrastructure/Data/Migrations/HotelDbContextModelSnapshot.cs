@@ -680,9 +680,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("GuestName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("GuestId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Guests")
                         .HasColumnType("integer");
@@ -718,6 +717,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GuestId");
 
                     b.HasIndex("RoomId");
 
@@ -1220,11 +1221,19 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("HotelManagementService.Core.Entities.Reservation", b =>
                 {
+                    b.HasOne("HotelManagementService.Core.Entities.Guest", "Guest")
+                        .WithMany("Reservations")
+                        .HasForeignKey("GuestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("HotelManagementService.Core.Entities.Room", "Room")
                         .WithMany("Reservations")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guest");
 
                     b.Navigation("Room");
                 });
@@ -1362,6 +1371,8 @@ namespace HotelManagementService.Infrastructure.Data.Migrations
                     b.Navigation("Bookings");
 
                     b.Navigation("GuestPreferences");
+
+                    b.Navigation("Reservations");
 
                     b.Navigation("RestaurantOrders");
                 });
