@@ -1,7 +1,30 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelManagementService.Application.DTOs;
-public record CreateReservationDto(
+public class CreateReservationDto
+{
+    [Required] 
+    public int RoomId {get;set;}
+    [Required] 
+    public string FirstName {get;set;}
+    [Required] 
+    public string LastName {get;set;}
+    [Required] 
+    public string Email {get;set;}
+    public string ReservationSource {get;set;}
+    public string SpecialRequests {get;set;}
+    public string Phone {get;set;}
+    public string IdNumber {get;set;}
+    [Required] 
+    public DateTime CheckIn {get;set;}
+    [Required] 
+    public DateTime CheckOut {get;set;}
+    [Required] 
+    public int Guests {get;set;}
+    public List<int> PreferenceIds {get;set;}= null; 
+}
+
+public record CreateWalkInCheckinDto(
     [Required] int RoomId,
     [Required] string FirstName,
     [Required] string LastName,
@@ -9,7 +32,10 @@ public record CreateReservationDto(
     string ReservationSource,
     string SpecialRequests,
     string Phone,
-    string IdNumber,   
+    string IdNumber,
+    string IdType,
+    string PaymentMethod,
+    decimal Deposit,   
     [Required] DateTime CheckIn,
     [Required] DateTime CheckOut,
     [Required] int Guests,

@@ -71,7 +71,8 @@ public class ReservationService : IReservationService
                 reservation.GuestId = guestId;
 
                 //Assign status
-                reservation.Status = ReservationStatuses.Reserved;
+                reservation.Status = ReservationStatuses.CheckedIn;
+                //reservation.Status = status;
 
                 // Calculate total amount
                 var nights = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;

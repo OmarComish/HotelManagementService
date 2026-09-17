@@ -1,5 +1,6 @@
 using HotelManagementService.Application.DTOs;
 using HotelManagementService.Application.Interfaces;
+using HotelManagementService.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelFlowAPI.API.Controllers;
@@ -70,13 +71,45 @@ public class ReservationsController: ControllerBase
          //4. render results
         return Ok(response);
     }
-    /*[HttpPost("walkin-checkin")]
-    public async Task<ActionResult<ResponseDto>> WalkinCheckin()
+    [HttpPost("walkin-checkin")]
+    public async Task<ActionResult<ResponseDto>> WalkinCheckin(CreateWalkInCheckinDto dto)
     {
+        var response = new ResponseDto{Status ="error", Message = BadRequest("Check-in failed.").ToString()};
         //TODO
         //1. Create an appropriate DTO
         //2. Implement the correct workflow (Guest -> Reservation -> Checkin)
-    }*/
+        if(dto!=null)
+        {
+            var reservationDto = new CreateReservationDto
+            {
+                RoomId = dto.RoomId,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email=dto.Email,
+                ReservationSource = dto.ReservationSource,
+                SpecialRequests=dto.SpecialRequests,
+                Phone = dto.Phone,
+                IdNumber = dto.IdNumber,
+                CheckIn = dto.CheckIn,
+                CheckOut = dto.CheckOut,
+                Guests = dto.Guests,
+                PreferenceIds = dto.PreferenceIds
+            };
+            //new Reservation
+            
+            response = await _reservationService.CreateReservation(reservationDto);
+            if(response.Status =="success")
+            {
+                //3. create checkin invoice
+                var ans = (ReservationDto) response.Payload; 
+                response = await _invoiceService.GenerateCheckInInvoiceAsync(ans.Id);
+                //4. Deposit > 0 ? Use invoice ID from response object to make a payment
+                //make a payment object here and insert a record  of a deposit for this client 
+                ///TODO: Create Repository for Payments, to implement the payments workflow
+            }
+        }
+        return Ok(response);
+    }
     [HttpGet("{roomNumber}")]
     public async Task<ActionResult<ReservationDto>> GetCurrentReservationByRoomNumber(string roomNumber)
     {
