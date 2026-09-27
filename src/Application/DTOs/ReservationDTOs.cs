@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using HotelManagementService.Core.Entities;
 
 namespace HotelManagementService.Application.DTOs;
 public class CreateReservationDto
@@ -22,6 +23,7 @@ public class CreateReservationDto
     [Required] 
     public int Guests {get;set;}
     public List<int> PreferenceIds {get;set;}= null; 
+    public ReservationStatuses Status {get; set;} = ReservationStatuses.Reserved;
 }
 
 public record CreateWalkInCheckinDto(

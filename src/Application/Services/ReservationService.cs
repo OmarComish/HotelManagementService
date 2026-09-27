@@ -21,6 +21,7 @@ public class ReservationService : IReservationService
 
     public async Task<ResponseDto> CreateReservation(CreateReservationDto createReservationDto)
     {
+        Console.WriteLine($"RESERVATION STATUS {createReservationDto.Status}");
         //this workflow is missing Adding of a guest first before creating a reservation
         //once adding guest is successful, add the reservation
         var response = new ResponseDto{Status ="error", Message="Failed to create reservation"};
@@ -64,17 +65,23 @@ public class ReservationService : IReservationService
                     return response;
                 }
                 
+              // Console.WriteLine($"BEFORE MAPPING: {createReservationDto.Status}");
+
                 var reservation = _mapper.Map<Reservation>(createReservationDto);
+             
+                reservation.Status = createReservationDto.Status;
 
                //Assign the Foreign Key Guest ID to link Guest with their Reservation
              
-                reservation.GuestId = guestId;
+                //reservation.GuestId = guestId;
 
                 //Assign status
-                reservation.Status = ReservationStatuses.CheckedIn;
+                //reservation.Status = reservation.Status==ReservationStatuses.CheckedIn? reservation.Status:ReservationStatuses.Reserved;
                 //reservation.Status = status;
 
                 // Calculate total amount
+
+                reservation.GuestId = guestId;
                 var nights = (createReservationDto.CheckOut - createReservationDto.CheckIn).Days;
                 var roomType = await _unitOfWork.RoomTypes.GetByIdAsync(room.RoomTypeId);
                 reservation.TotalAmount = nights * roomType.Price;
@@ -84,7 +91,7 @@ public class ReservationService : IReservationService
                 //await _unitOfWork.SaveChangesAsync();
 
                 //Change the room status to reserved
-                room.Status = room.Status== RecordStatus.Available? RecordStatus.Reserved: room.Status;
+                room.Status = createReservationDto.Status== ReservationStatuses.CheckedIn? RecordStatus.Occupied: room.Status;
                 var roomstatuschange = await _unitOfWork.Rooms.UpdateAsync(room);
 
                 await _unitOfWork.SaveChangesAsync();

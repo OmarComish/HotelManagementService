@@ -8,6 +8,4 @@ public interface IReservationService
     Task<List<ReservationDto>> GetAllReservations();
     Task<ReservationDto> UpdateReservationAsync(UpdateReservationDto updatereservationdto);
     Task<ResponseDto> CheckIn(CheckInDto dto);
-    //Task<ReservationDto> GetCurrentReservationByRoomNumberAsync(string roomNumber);
-    //Task<ReservationDto> TestInterface(string roomNumber);
 }

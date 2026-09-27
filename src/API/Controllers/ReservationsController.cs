@@ -80,6 +80,9 @@ public class ReservationsController: ControllerBase
         //2. Implement the correct workflow (Guest -> Reservation -> Checkin)
         if(dto!=null)
         {
+             Console.WriteLine($"WALKIN DTO CHECKIN: {dto.CheckIn}");
+             Console.WriteLine($"WALKIN DTO CHECKOUT: {dto.CheckOut}");
+             
             var reservationDto = new CreateReservationDto
             {
                 RoomId = dto.RoomId,
@@ -93,7 +96,8 @@ public class ReservationsController: ControllerBase
                 CheckIn = dto.CheckIn,
                 CheckOut = dto.CheckOut,
                 Guests = dto.Guests,
-                PreferenceIds = dto.PreferenceIds
+                PreferenceIds = dto.PreferenceIds,
+                Status = ReservationStatuses.CheckedIn,
             };
             //new Reservation
             
