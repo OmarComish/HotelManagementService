@@ -33,8 +33,22 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
             .Include(r =>r.Room)
             .Where(r => r.Room.RoomNumber == roomNumber)
             .FirstOrDefaultAsync();
+
+             Console.WriteLine($"DEBUG Reservation ID: {response?.Id}");
+             Console.WriteLine($"DEBUG Reservation GuestId: {response?.GuestId}");
+             Console.WriteLine($"DEBUG Guest ID: {response?.Guest?.Id}");
         
         return response;
+    }
+
+    public async Task<Reservation?> GetActiveReservationByGuestAsync(int guestId)
+    {
+        return await _context.Reservations
+            .Include(r => r.Room)
+            .Include(r => r.Guest)
+            .FirstOrDefaultAsync(r =>
+                r.GuestId == guestId &&
+                r.Status == ReservationStatuses.CheckedIn);
     }
     private async Task<IEnumerable<Reservation>> GetAllReservations()
     {

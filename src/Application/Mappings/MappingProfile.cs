@@ -24,9 +24,10 @@ public class MappingProfile : Profile
             );
         CreateMap<Reservation, ReservationDto>()
            .ForMember(dest => dest.Room, opt => opt.MapFrom(src => src.Room))
+           .ForMember(dest => dest.GuestId, opt => opt.MapFrom(src => src.GuestId))
            .ForMember(dest => dest.GuestName, opt => opt.MapFrom(src =>src.Guest!= null ? $"{src.Guest.FirstName} {src.Guest.LastName}": null));
 
-        //Reservation
+        //Room mappings
         CreateMap<CreateRoomDto, Room>();
         CreateMap<Room, RoomDto>()
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.RoomType != null? src.RoomType.Type: string.Empty))

@@ -141,6 +141,13 @@ public class GuestService :  IGuestService
     public async Task<ReservationDto> GetCurrentReservationByGuestIdAsync(string roomNumber)
     {
         var reservation = await _unitOfWork.Reservations.GetCurrentReservationByRoomNumberAsync(roomNumber);
-        return reservation!=null ? _mapper.Map<ReservationDto>(reservation) : null;
+
+          Console.WriteLine($"SERVICE - Reservation GuestId: {reservation.GuestId}");
+          var guest = _mapper.Map<ReservationDto>(reservation);
+          guest.GuestId = reservation.GuestId;
+          Console.WriteLine($"SERVICE - DTO GuestId: {guest.GuestId}");
+          Console.WriteLine($"SERVICE - DTO GuestName: {guest.GuestName}");
+          //return reservation!=null ? _mapper.Map<ReservationDto>(reservation) : null;
+          return guest;
     }
 }
