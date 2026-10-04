@@ -27,17 +27,12 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
 
     public async Task<Reservation> GetCurrentReservationByRoomNumberAsync(string roomNumber)
     {
-  
         var response = await _context.Reservations
             .Include(r =>r.Guest)
             .Include(r =>r.Room)
             .Where(r => r.Room.RoomNumber == roomNumber)
             .FirstOrDefaultAsync();
-
-             Console.WriteLine($"DEBUG Reservation ID: {response?.Id}");
-             Console.WriteLine($"DEBUG Reservation GuestId: {response?.GuestId}");
-             Console.WriteLine($"DEBUG Guest ID: {response?.Guest?.Id}");
-        
+                    
         return response;
     }
 

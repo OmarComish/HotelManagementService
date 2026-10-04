@@ -20,5 +20,10 @@ public class InvoicesController: ControllerBase
         }
         return response;
     }
-
+    [HttpGet("all")]
+    public async Task<ActionResult> Get()
+    {
+        var response = await _invoiceservice.GetInvoicesAsync();
+        return Ok(response);
+    }
 }

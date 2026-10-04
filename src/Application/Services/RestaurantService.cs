@@ -37,7 +37,7 @@ public class RestaurantService : IRestaurantService
     {
         var results = await _unitOfWork.MenuItems.GetAllAsync();
         
-        Console.WriteLine($"Total menu items for hotel {hotelId}: {results.Count()}");
+        //Console.WriteLine($"Total menu items for hotel {hotelId}: {results.Count()}");
         if (results == null)
         {
             throw new KeyNotFoundException($"No restaurant found for hotel {hotelId}");
@@ -55,33 +55,33 @@ public class RestaurantService : IRestaurantService
         
         try
         {
-            Console.WriteLine("STEP 1 - AddOrderAsync started");
+            //Console.WriteLine("STEP 1 - AddOrderAsync started");
             //1. Validate table belongs to hotel
             var table = await _unitOfWork.RestaurantTables.GetByIdWithDetailsAsync(dto.TableId);
 
-            Console.WriteLine($"STEP 2 - Table result: {table?.Id}");
+            //Console.WriteLine($"STEP 2 - Table result: {table?.Id}");
             if (table == null )
             {
                 return new ResponseDto { Status = "error", Message = $"Table with ID {dto.TableId} not found in this hotel."};
             }
 
-            Console.WriteLine("STEP 3 - Table validation passed");
+            //Console.WriteLine("STEP 3 - Table validation passed");
 
             //2. Validate Guest belongs to hotel or provide a default guest if not provided
 
-             Console.WriteLine("STEP 4 - Starting guest validation");
-             Console.WriteLine($"GuestId: {dto.GuestId}");
+             //Console.WriteLine("STEP 4 - Starting guest validation");
+             //Console.WriteLine($"GuestId: {dto.GuestId}");
 
             if(dto.GuestId.HasValue)
             {
                 try
                 {
-                    Console.WriteLine($"STEP 5.1 - Guest before lookup : {dto.GuestId}");
+                    //Console.WriteLine($"STEP 5.1 - Guest before lookup : {dto.GuestId}");
 
                     //var guest = await _unitOfWork.GuestPreferences.GetByIdWithDetailsAsync(dto.GuestId.Value);//(g=>g.Id==dto.GuestId.Value);//GetByIdWithDetailsAsync(dto.GuestId.Value);
                     var guest = await _unitOfWork.Guests.GetByIdAsync(dto.GuestId.Value);
 
-                    Console.WriteLine($"STEP 5.2 - Guest lookup result: {guest.Id}");
+                    //Console.WriteLine($"STEP 5.2 - Guest lookup result: {guest.Id}");
                     if (guest == null )//|| guest.HotelId != hotelId || guest.Status != "Approved")
                     {
                         // Provide a default guest if none is specified
@@ -92,8 +92,8 @@ public class RestaurantService : IRestaurantService
                 }
                 catch(Exception ex)
                 {
-                     Console.WriteLine($"GUEST LOOKUP ERROR: {ex.Message}");
-                     Console.WriteLine($"GUEST LOOKUP INNER ERROR: {ex.InnerException?.Message}");
+                     //Console.WriteLine($"GUEST LOOKUP ERROR: {ex.Message}");
+                     //Console.WriteLine($"GUEST LOOKUP INNER ERROR: {ex.InnerException?.Message}");
                 }
 
             }
@@ -102,12 +102,12 @@ public class RestaurantService : IRestaurantService
                 // Provide a default guest if none is specified
                 dto.GuestId = 1; // Assuming the default guest has ID 1
             }
-             Console.WriteLine($"STEP 6 - Guest validation passed. Final GuestId: {dto.GuestId}");
+             //Console.WriteLine($"STEP 6 - Guest validation passed. Final GuestId: {dto.GuestId}");
             //3. If charging to room, find the guest's active reservation and invoice
              Invoice?roomInvoice = null;
 
-             Console.WriteLine("STEP 7 - Checking payment method");
-             Console.WriteLine($"PaymentMethod received: [{dto.PaymentMethod}]");
+             //Console.WriteLine("STEP 7 - Checking payment method");
+             //Console.WriteLine($"PaymentMethod received: [{dto.PaymentMethod}]");
 
             if(dto.PaymentMethod.Equals("room-charge", StringComparison.OrdinalIgnoreCase))
             {
@@ -128,7 +128,7 @@ public class RestaurantService : IRestaurantService
 
                 roomInvoice = await _unitOfWork.Invoices.GetByReservationAsync(reservation.Id);
 
-                Console.WriteLine($"STEP 10 - Invoice result: {roomInvoice?.Id}");
+               // Console.WriteLine($"STEP 10 - Invoice result: {roomInvoice?.Id}");
                 
                
                 if(roomInvoice ==null)
@@ -192,7 +192,7 @@ public class RestaurantService : IRestaurantService
             order.CreatedBy = "Admin"; // Replace with actual user info if available 
 
             //6. Add restaurant charge to room invoice  
-            Console.WriteLine($"STEP 11 - Invoice line items computation: {roomInvoice?.Id}");
+           // Console.WriteLine($"STEP 11 - Invoice line items computation: {roomInvoice?.Id}");
             if(roomInvoice!=null)
             {
                 var lineItem = new InvoiceLineItem
@@ -218,7 +218,7 @@ public class RestaurantService : IRestaurantService
             await _unitOfWork.RestaurantOrders.AddAsync(order);
             await _unitOfWork.SaveChangesAsync();
 
-            Console.WriteLine($"STEP 13 - Adding Invoice line item and Order items...");
+            //Console.WriteLine($"STEP 13 - Adding Invoice line item and Order items...");
 
             //6. Return mapped to DTO
             var orderDto = _mapper.Map<RestaurantOrderDto>(order);
@@ -233,17 +233,15 @@ public class RestaurantService : IRestaurantService
             };
         }
     }
-
     public async Task<IEnumerable<RestaurantOrderDto>> GetAllOrdersAsync()
     {
         var orders = await _unitOfWork.RestaurantOrders.GetRestaurantOrdersAsync();
 
         var orderTypeValue = orders.FirstOrDefault()?.OrderType; // What is the type and value?
-        Console.WriteLine($"OrderType: {orderTypeValue} - Type: {orderTypeValue?.GetType()}");    
+        //Console.WriteLine($"OrderType: {orderTypeValue} - Type: {orderTypeValue?.GetType()}");    
         
         return _mapper.Map<IEnumerable<RestaurantOrderDto>>(orders);
     }
-
     public async Task<RestaurantOrderDto> GetOrderByIdAsync(int orderId)
     {
         var order = await _unitOfWork.RestaurantOrders.GetRestaurantOrderByIdAsync(orderId);
@@ -279,14 +277,14 @@ public class RestaurantService : IRestaurantService
                 response.Status ="success";
                 response.Message = "Invoice line items added successfully!";
 
-                Console.WriteLine("***AddInvoiceLineItem action completed***");
+               // Console.WriteLine("***AddInvoiceLineItem action completed***");
             }
         }
         catch(Exception ex)
         {
             response.Message = $"Ann error occurred while adding invoice line item {ex.InnerException?.Message}";
-              Console.WriteLine($"GUEST LOOKUP ERROR: {ex.Message}");
-            Console.WriteLine($"GUEST LOOKUP INNER ERROR: {ex.InnerException?.Message}");
+              //Console.WriteLine($"GUEST LOOKUP ERROR: {ex.Message}");
+            //Console.WriteLine($"GUEST LOOKUP INNER ERROR: {ex.InnerException?.Message}");
         }
 
         return response;

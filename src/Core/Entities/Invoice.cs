@@ -29,7 +29,7 @@ public class Invoice : BaseEntity
     public string? PaymentMethod {get; set;}
 
     // Navigation properties
-    //public virtual Reservation Reservation { get; set; } = null!;
+    public virtual Reservation Reservation { get; set; } = null!;
     public virtual ICollection<InvoiceLineItem> LineItems { get; set; }= new List<InvoiceLineItem>();
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

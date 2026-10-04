@@ -40,6 +40,18 @@ public class MappingProfile : Profile
         //Invoice
         CreateMap<Invoice, CreateInvoiceDto>().ReverseMap();
         CreateMap<LineItemsDto, InvoiceLineItem>();
+        CreateMap<InvoiceLineItem, LineItemsDto>();
+        CreateMap<Invoice, ReadInvoiceDto>()
+            .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))
+            .ForMember(dest => dest.InvoiceNumber, opt => opt.MapFrom(src => src.InvoiceNumber ?? string.Empty))
+            .ForMember(dest => dest.TotalAmount,opt => opt.MapFrom(src => src.TotalAmount))
+            .ForMember(dest => dest.PaymentMethod,opt => opt.MapFrom(src => src.PaymentMethod))
+            .ForMember(dest => dest.CheckIn,opt => opt.MapFrom(src => src.Reservation.CheckIn))
+            .ForMember( dest => dest.CheckOut,opt => opt.MapFrom(src => src.Reservation.CheckOut))
+            .ForMember( dest => dest.Status,opt => opt.MapFrom(src => src.Status.ToString()))
+            .ForMember(dest => dest.RoomNumber,opt => opt.MapFrom(src => src.Reservation.Room.RoomNumber))
+            .ForMember( dest => dest.Guest, opt => opt.MapFrom(src => src.Reservation.Guest.FirstName + " " + src.Reservation.Guest.LastName));
+            //.ForMember(dest => dest.LineItems, opt =>opt.MapFrom(src => src.LineItems));
         
         //Guest
         CreateMap<CreateGuestDto, Guest>()

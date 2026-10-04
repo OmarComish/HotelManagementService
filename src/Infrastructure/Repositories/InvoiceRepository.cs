@@ -13,6 +13,22 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
     {
         return await _context.Invoices.FirstOrDefaultAsync(i =>i.ReservationId == reservationId);
     }
+    public async Task<IEnumerable<Invoice>> GetInvoicesAsync()
+    {
+        var invoice = await _context.Invoices
+        .AsNoTracking()
+        .AsSplitQuery()
+        .Include(i => i.LineItems)
+        .Include(i => i.Reservation)
+            .ThenInclude(r => r.Guest)
+        .Include(i => i.Reservation)
+            .ThenInclude(r => r.Room)
+        .ToListAsync(); //i => i.ReservationId == reservationId);
+
+        Console.WriteLine(invoice.First(i => i.InvoiceNumber == "INV-2026-00001").LineItems.Count);
+
+        return invoice;
+    }
 
 }
 

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
+using System.Security.Cryptography.X509Certificates;
 using HotelManagementService.Core.Entities;
 
 namespace HotelManagementService.Application.DTOs;
@@ -21,8 +23,24 @@ public record LineItemsDto(
     [Required] string Description,
     [Required] int Quantity,
     [Required] decimal UnitPrice,
-    decimal LinetTotal
+    decimal LineTotal
 );
+
+public class ReadInvoiceDto
+{
+    public int ReservationId {get; set;}
+    public string InvoiceNumber {get; set;}
+    public DateTime CheckIn {get; set;}
+    public DateTime CheckOut {get; set;}
+    public string Status {get; set;}
+    public decimal TotalAmount {get; set;}
+    public string RoomNumber {get; set;}
+    public string Guest {get; set;}
+    public string? PaymentMethod {get; set;}
+    public List<LineItemsDto> LineItems {get; set;} = new();
+}
+
+
 /*
 // Invoice DTOs (referenced but not defined)
 public record CreateInvoiceDto(

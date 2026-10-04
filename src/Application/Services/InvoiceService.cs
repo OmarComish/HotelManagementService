@@ -31,7 +31,7 @@ public class InvoiceService: IInvoiceService
                 InvoiceNumber = await GenerateInvoiceNumberAsync(),
                 IssuedDate = DateTime.UtcNow,
                 DueDate = DateTime.UtcNow,
-                Status = InvoiceStatus.Draft,
+                Status = InvoiceStatus.draft,
                 PaymentMethod = "Cash",
                 LineItems = new List<InvoiceLineItem>
                 {
@@ -44,7 +44,7 @@ public class InvoiceService: IInvoiceService
                 }
             };  
             invoice.TotalAmount = invoice.LineItems.Sum(l =>l.LineTotal);
-            invoice.Status = InvoiceStatus.Issued;
+            invoice.Status = InvoiceStatus.draft;
 
             await _unitOfWork.Invoices.AddAsync(invoice);
             await _unitOfWork.SaveChangesAsync();
@@ -67,7 +67,11 @@ public class InvoiceService: IInvoiceService
         var count = await _unitOfWork.Invoices.CountAsync();
         return $"INV-{DateTime.UtcNow.Year}-{(count + 1):D5}";
     }
-
+    public async Task<IEnumerable<ReadInvoiceDto>> GetInvoicesAsync()
+    {
+        var response = await _unitOfWork.Invoices.GetInvoicesAsync();
+        return _mapper.Map<IEnumerable<ReadInvoiceDto>>(response);
+    }
     public async Task<ResponseDto> GenerateCheckOutInvoiceAsync(int reservationId)
     {
         var response = new ResponseDto{Status ="error", Message="Failed to create invoice"};
@@ -103,7 +107,7 @@ public class InvoiceService: IInvoiceService
                 InvoiceNumber = await GenerateInvoiceNumberAsync(),
                 IssuedDate    = DateTime.UtcNow,
                 DueDate       = DateTime.UtcNow.AddDays(1),
-                Status        = InvoiceStatus.Issued,
+                Status        = InvoiceStatus.draft,
                 LineItems     = lineItems,
                 TotalAmount   = lineItems.Sum(l => l.LineTotal),
                 PaymentMethod = "Cash"
