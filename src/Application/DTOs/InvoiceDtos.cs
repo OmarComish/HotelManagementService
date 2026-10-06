@@ -18,13 +18,18 @@ public record InvoiceDto(
     InvoiceStatus Status,
     List<LineItemsDto>? LineItems = null
 );
-public record LineItemsDto(
-    [Required] int InvoiceId,
-    [Required] string Description,
-    [Required] int Quantity,
-    [Required] decimal UnitPrice,
-    decimal LineTotal
-);
+public record LineItemsDto
+{
+    [Required] 
+    public int InvoiceId {get; set;}
+    [Required] 
+    public string Description {get; set;}
+    [Required] 
+    public int Quantity {get; set;}
+    [Required] 
+    public decimal UnitPrice {get; set;}
+    public decimal LineTotal {get; set;}
+}
 
 public class ReadInvoiceDto
 {

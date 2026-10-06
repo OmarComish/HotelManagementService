@@ -35,6 +35,27 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
                     
         return response;
     }
+    public async Task<IEnumerable<Reservation>> GetAllReservationsPendingCheckOutAsync()
+    {
+        var today = DateTime.UtcNow.Date;
+        var tomorrow = today.AddDays(1);
+
+        var reservations = await _context.Reservations
+            .AsNoTracking()
+            .Where(r =>
+                r.CheckOut >= today &&
+                r.CheckOut < tomorrow)
+            .Select(r => new Reservation
+            {
+                Id = r.Id,
+                CheckIn = r.CheckIn,
+                CheckOut = r.CheckOut,
+                Status = r.Status
+            })
+            .ToListAsync();
+
+        return reservations;
+    }
 
     public async Task<Reservation?> GetActiveReservationByGuestAsync(int guestId)
     {

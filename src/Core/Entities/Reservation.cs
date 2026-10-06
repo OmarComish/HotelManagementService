@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 namespace HotelManagementService.Core.Entities;
 
 public class Reservation : BaseEntity
@@ -38,7 +39,7 @@ public class Reservation : BaseEntity
     public int Guests { get; set; }
 
     // Navigation properties
-    
+    [JsonIgnore]
     public virtual Room Room { get; set; } = null!;
     public virtual Guest Guest { get; set; } = null!;
     //public virtual Payment? Payment { get; set; }

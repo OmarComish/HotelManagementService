@@ -48,3 +48,14 @@ public record GuestBookingDto
     public string Status { get; init; } = string.Empty;
     public decimal TotalAmount { get; init; }
 }
+public record CheckOutGuestDto
+{
+    public int Id { get; set; }
+     public DateTime? CheckIn { get; set; }
+     public DateTime? CheckOut { get; set; }
+     public string Name {get; set;}
+     public string RoomNumber {get; set;}
+     public decimal TotalBill {get; set;}
+     public string? Status {get; set;}
+}
+

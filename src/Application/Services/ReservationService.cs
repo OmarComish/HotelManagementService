@@ -231,6 +231,32 @@ public class ReservationService : IReservationService
         
         return response;
     }
+    public async Task<ResponseDto> CheckOut(int reservationId)
+    {
+        var response = new ResponseDto { Status = "error", Message = "Failed to check out" };
+        //Check if reservation exists
+        var reservation = await _unitOfWork.Reservations.GetByIdAsync(reservationId) 
+            ?? throw new Exception("Reservation not found!");
+
+        // Update status to CheckedOut
+        reservation.Status = ReservationStatuses.CheckedOut;
+        reservation.UpdatedAt = DateTime.UtcNow;
+
+        // Change room status to Available
+        bool roomstatuschanged = await ChangeRoomStatus(RecordStatus.Available, reservation.RoomId);
+
+        if(roomstatuschanged)
+        {
+            await _unitOfWork.Reservations.UpdateAsync(reservation);
+            await _unitOfWork.SaveChangesAsync();
+
+            response.Status = "success";
+            response.Message = $"Check-out for guest {reservation.GuestId} successful";
+            response.Payload = reservation;
+        }
+        
+        return response;
+    }
     private async Task<bool> ChangeRoomStatus(RecordStatus status, int roomId)
     {
         bool success = false;
@@ -288,6 +314,11 @@ public class ReservationService : IReservationService
         response.Payload = reservation; //_mapper.Map<ReservationDto>(reservation);
 
         return response;
+    }
+    public async Task<IEnumerable<ReservationDto>?> GetReservationOnCheckOutAsync()
+    {
+        var reservation = await _unitOfWork.Reservations.GetAllReservationsPendingCheckOutAsync();
+        return reservation != null ? _mapper.Map<IEnumerable<ReservationDto>>(reservation) : null;
     }
     private async Task<decimal> CalculateRoomCost(DateTime checkIn, DateTime checkOut, int roomTypeId)
     {

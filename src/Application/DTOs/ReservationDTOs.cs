@@ -105,11 +105,11 @@ public class CheckInDto
      public DateTime? CheckOut { get; set; }
      public string? SpecialRequests { get; set; }
      public string? PaymentMethod {get; set;}
-   /* public string? ReservationSource { get; set; }
-   
-    public string? Phone { get; set; }
-    public string? Email { get; set; }
-    public string? Status { get; set; }
-    public string? GuestName { get; set; }
-    public int? RoomId { get; set; }*/
+}
+public class ReservationCheckOutDto
+{
+     public int Id { get; set; }
+     public decimal MinibarCharges {get; set;}
+     public decimal DamageCharges {get; set;}
+     public string? PaymentMethod {get; set;}
 }

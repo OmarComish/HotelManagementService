@@ -118,7 +118,6 @@ public class GuestService :  IGuestService
 
         return _mapper.Map<GuestDto>(guest);
     }
-
     public async Task<bool> DeleteGuestAsync(int id)
     {
         var guest = await _unitOfWork.Guests.GetByIdAsync(id);
@@ -147,4 +146,10 @@ public class GuestService :  IGuestService
           guest.GuestId = reservation.GuestId; //Automapping is skipping GuestId,- work aroud is to assign it manually to the guest object
           return guest;
     }
+    public async Task<IEnumerable<CheckOutGuestDto>> GetCheckOutGuests()
+    {
+        var response = await _unitOfWork.Invoices.GetInvoicesPendingCheckOutAsync();
+        return _mapper.Map<IEnumerable<CheckOutGuestDto>>(response);
+    }
+
 }

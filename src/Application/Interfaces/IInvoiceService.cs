@@ -8,4 +8,5 @@ public interface IInvoiceService
     Task<ResponseDto> GenerateCheckOutInvoiceAsync(int reservationId);
     Task<ResponseDto> AddInvoiceLineItemAsync(int reservationId, LineItemsDto dto);
     Task<IEnumerable<ReadInvoiceDto>> GetInvoicesAsync();
+    Task<ResponseDto> SettleInvoiceAsync(int reservationId);
 }

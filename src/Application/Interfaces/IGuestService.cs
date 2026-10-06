@@ -9,4 +9,5 @@ public interface IGuestService
     Task<GuestDto> UpdateGuestAsync(int id, UpdateGuestDto updateGuestDto);
     Task<bool> DeleteGuestAsync(int id);
     Task<ReservationDto> GetCurrentReservationByGuestIdAsync(string roomNumber);
+    Task<IEnumerable<CheckOutGuestDto>> GetCheckOutGuests();
 }

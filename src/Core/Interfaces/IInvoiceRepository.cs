@@ -6,4 +6,5 @@ public interface IInvoiceRepository :IRepository<Invoice>
 {
     Task<Invoice> GetByReservationAsync(int reservationId);
     Task<IEnumerable<Invoice>> GetInvoicesAsync();
+    Task<IEnumerable<Invoice>> GetInvoicesPendingCheckOutAsync();
 }

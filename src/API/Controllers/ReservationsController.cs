@@ -3,7 +3,7 @@ using HotelManagementService.Application.Interfaces;
 using HotelManagementService.Core.Entities;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HotelFlowAPI.API.Controllers;
+namespace HotelManagementService.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class ReservationsController: ControllerBase
@@ -114,6 +114,62 @@ public class ReservationsController: ControllerBase
         }
         return Ok(response);
     }
+    
+    [HttpPut("checkout")]
+    public async Task<ActionResult<ResponseDto>> Checkout(ReservationCheckOutDto dto)
+    {
+        var response = new ResponseDto{Status ="error", Message = BadRequest("Check-out failed.").ToString()};
+        if(dto!= null)
+        {
+            if(dto.MinibarCharges > 0)
+            {
+                var  invoicelineItems =new LineItemsDto
+                {
+                    InvoiceId = 1, // This will be set when the invoice is created
+                    Description = "Minibar Charges",
+                    Quantity = 1,
+                    UnitPrice = dto.MinibarCharges,
+                    LineTotal = dto.MinibarCharges
+                };
+                response = await _invoiceService.AddInvoiceLineItemAsync(dto.Id, invoicelineItems);
+            }
+            if(dto.DamageCharges > 0)
+            {
+                var invoicelineItems = new LineItemsDto
+                {
+                    InvoiceId = 2, // This will be set when the invoice is created
+                    Description = "Damage Charges",
+                    Quantity = 1,
+                    UnitPrice = dto.DamageCharges,
+                    LineTotal = dto.DamageCharges 
+                };
+                response = await _invoiceService.AddInvoiceLineItemAsync(dto.Id, invoicelineItems);
+            }
+            
+            if(response.Status == "success")
+            {
+                response = await _reservationService.CheckOut(dto.Id);
+                //3. create checkout invoice
+            }
+            if(response.Status !="success" && dto.DamageCharges == 0 && dto.MinibarCharges == 0)
+            {
+                response = await _reservationService.CheckOut(dto.Id);
+            }
+            //Finally, settle the invoice
+            if(response.Status == "success")
+            {
+                response = await _invoiceService.SettleInvoiceAsync(dto.Id);
+            }
+        }
+        return Ok(response);
+    }
+    [HttpGet("checkoutguests")]
+    public async Task<ActionResult<ReservationDto?>> GetReservationsPendingCheckOut()
+    {
+        var response = await _reservationService.GetReservationOnCheckOutAsync();
+        return Ok(response);
+    }
+
     [HttpGet("{roomNumber}")]
     public async Task<ActionResult<ReservationDto>> GetCurrentReservationByRoomNumber(string roomNumber)
     {

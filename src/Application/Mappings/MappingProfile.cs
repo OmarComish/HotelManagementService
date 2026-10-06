@@ -51,8 +51,16 @@ public class MappingProfile : Profile
             .ForMember( dest => dest.Status,opt => opt.MapFrom(src => src.Status.ToString()))
             .ForMember(dest => dest.RoomNumber,opt => opt.MapFrom(src => src.Reservation.Room.RoomNumber))
             .ForMember( dest => dest.Guest, opt => opt.MapFrom(src => src.Reservation.Guest.FirstName + " " + src.Reservation.Guest.LastName));
-            //.ForMember(dest => dest.LineItems, opt =>opt.MapFrom(src => src.LineItems));
         
+        CreateMap<Invoice, CheckOutGuestDto>()
+             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ReservationId))
+             .ForMember(dest => dest.TotalBill,opt => opt.MapFrom(src => src.TotalAmount))
+             .ForMember(dest => dest.CheckIn,opt => opt.MapFrom(src => src.Reservation.CheckIn))
+             .ForMember( dest => dest.CheckOut,opt => opt.MapFrom(src => src.Reservation.CheckOut))
+             .ForMember( dest => dest.Status,opt => opt.MapFrom(src => src.Reservation.Status.ToString()))
+             .ForMember(dest => dest.RoomNumber,opt => opt.MapFrom(src => src.Reservation.Room.RoomNumber))
+             .ForMember( dest => dest.Name, opt => opt.MapFrom(src => src.Reservation.Guest.FirstName + " " + src.Reservation.Guest.LastName));
+           
         //Guest
         CreateMap<CreateGuestDto, Guest>()
           .ForMember(dest => dest.GuestPreferences, opt => opt.Ignore()); //handled manually

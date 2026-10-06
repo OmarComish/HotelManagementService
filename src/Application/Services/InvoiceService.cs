@@ -133,10 +133,11 @@ public class InvoiceService: IInvoiceService
         var response = new ResponseDto{Status ="error", Message="Failed to add invoice line item"};
         try
         {
-            var invoice= await _unitOfWork.Invoices.GetByIdAsync(reservationId);
+            Console.WriteLine($"Adding line item for reservation ID: {reservationId}");
+            var invoice= await _unitOfWork.Invoices.GetByReservationAsync(reservationId);
             if(invoice != null)
             {
-               
+               Console.WriteLine($"Invoice found for ID: {reservationId}  ...Adding line item: {dto.Description}, Quantity: {dto.Quantity}, UnitPrice: {dto.UnitPrice}");
                 var lineItem = _mapper.Map<InvoiceLineItem>(dto);
                 lineItem.InvoiceId = invoice.Id;
 
@@ -145,12 +146,38 @@ public class InvoiceService: IInvoiceService
                 response.Payload = results;
                 response.Status = "success";
                 response.Message = "line item added successfully";    
+                Console.WriteLine($"Adding line item for reservation ID: {reservationId} successfully completed");
             }
-    
+           Console.WriteLine($"failed to find Invoice for reservation ID : {reservationId}.. No line item added");
         }
         catch (Exception e)
         {
-            response.Message = e.Message;
+            response.Message = e.InnerException?.Message;
+        }
+        return response;
+    }
+    public async Task<ResponseDto> SettleInvoiceAsync(int reservationId)
+    {
+        var response = new ResponseDto{Status ="error", Message="Failed to settle invoice"};
+        try
+        {
+            var invoice = await _unitOfWork.Invoices.GetByReservationAsync(reservationId);
+            if(invoice != null)
+            {
+                invoice.Status = InvoiceStatus.paid;
+                _unitOfWork.Invoices.Update(invoice);
+                await _unitOfWork.SaveChangesAsync();
+                response.Status = "success";
+                response.Message = $"Invoice {invoice.InvoiceNumber} settled successfully";
+            }
+            else
+            {
+                response.Message = $"No invoice found for reservation ID: {reservationId}";
+            }
+        }
+        catch (Exception e)
+        {
+            response.Message = $"An error occurred while settling the invoice. Details: {e.Message}";
         }
         return response;
     }

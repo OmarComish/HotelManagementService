@@ -130,5 +130,11 @@ public class GuestsController : ControllerBase
             return StatusCode(500, "Internal server error");
         }
     }
+    [HttpGet("CheckOutGuests")]
+    public async Task<IActionResult> GetCheckOutGuests()
+    {
+        var response = await _guestService.GetCheckOutGuests();
+        return Ok(response);
+    }
 }
 
