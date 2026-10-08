@@ -45,7 +45,16 @@ public class ReadInvoiceDto
     public List<LineItemsDto> LineItems {get; set;} = new();
 }
 
+public record MarkInvoiceAsPaidDto(
+    [Required] string InvoiceNumber,
+    [Required] string PaymentMethod,
+    string? Notes = null
+);
 
+public record ChangeInvoiceStatusDto(
+    [Required] string InvoiceNumber,
+    [Required] InvoiceStatus NewStatus
+);
 /*
 // Invoice DTOs (referenced but not defined)
 public record CreateInvoiceDto(

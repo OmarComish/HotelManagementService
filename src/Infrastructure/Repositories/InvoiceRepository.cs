@@ -48,6 +48,10 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
 
         return invoice;
     }
+    public async Task<Invoice> GetInvoiceByNumberAsync(string invoiceNumber)
+    {
+        return await _context.Invoices.FirstOrDefaultAsync(i => i.InvoiceNumber == invoiceNumber);
+    }
 
 }
 

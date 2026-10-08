@@ -181,4 +181,93 @@ public class InvoiceService: IInvoiceService
         }
         return response;
     }
+    public async Task<ResponseDto> MarkInvoiceAsPaidAsync(MarkInvoiceAsPaidDto dto)
+    {
+        var response = new ResponseDto{Status ="error", Message="Failed to mark invoice as paid"};
+        try
+        {
+            var invoice = await _unitOfWork.Invoices.GetInvoiceByNumberAsync(dto.InvoiceNumber);
+            if(invoice != null)
+            {
+                invoice.Status = InvoiceStatus.paid;
+                invoice.PaymentMethod = dto.PaymentMethod;
+                invoice.UpdatedAt = DateTime.UtcNow;
+                invoice.UpdatedBy = "System"; // or set based on your logic
+                invoice.Notes = dto.Notes; // Add any additional notes if provided
+
+                _unitOfWork.Invoices.Update(invoice);
+                await _unitOfWork.SaveChangesAsync();
+
+                response.Status = "success";
+                response.Message = $"Invoice {invoice.InvoiceNumber} marked as paid successfully";
+            }
+            else
+            {
+                response.Message = $"No invoice found with number: {dto.InvoiceNumber}";
+            }
+        }
+        catch (Exception e)
+        {
+            response.Message = $"An error occurred while marking the invoice as paid. Details: {e.Message}";
+        }
+        return response;
+    }
+    public async Task<ResponseDto> SendInvoiceAsync(string invoiceNumber)
+    {
+        var response = new ResponseDto{Status ="error", Message="Failed to send invoice"};
+        try
+        {
+            var invoice = await _unitOfWork.Invoices.GetInvoiceByNumberAsync(invoiceNumber);
+            if(invoice != null)
+            {
+                invoice.Status = InvoiceStatus.sent;
+                invoice.UpdatedAt = DateTime.UtcNow;
+                invoice.UpdatedBy = "System"; // or set based on your logic
+
+                _unitOfWork.Invoices.Update(invoice);
+                await _unitOfWork.SaveChangesAsync();
+
+                response.Status = "success";
+                response.Message = $"Invoice {invoice.InvoiceNumber} sent successfully";
+            }
+            else
+            {
+                response.Message = $"No invoice found with number: {invoiceNumber}";
+            }
+        }
+        catch (Exception e)
+        {
+            response.Message = $"An error occurred while sending the invoice. Details: {e.Message}";
+        }
+        return response;
+    }
+    public async Task<ResponseDto> DeleteInvoiceAsync(string invoiceNumber)
+    {
+        var response = new ResponseDto{Status ="error", Message="Failed to delete invoice"};
+        try
+        {
+            var invoice = await _unitOfWork.Invoices.GetInvoiceByNumberAsync(invoiceNumber);
+            if(invoice != null)
+            {
+                invoice.Status = InvoiceStatus.voided;
+                invoice.UpdatedAt = DateTime.UtcNow;
+                invoice.UpdatedBy = "System";
+
+                _unitOfWork.Invoices.Update(invoice);
+                await _unitOfWork.SaveChangesAsync();
+
+                response.Status = "success";
+                response.Message = $"Invoice {invoice.InvoiceNumber} deleted successfully";
+            }
+            else
+            {
+                response.Message = $"No invoice found with number: {invoiceNumber}";
+            }
+        }
+        catch (Exception e)
+        {
+            response.Message = $"An error occurred while deleting the invoice. Details: {e.Message}";
+        }
+        return response;
+    }
 }

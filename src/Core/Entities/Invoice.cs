@@ -27,6 +27,9 @@ public class Invoice : BaseEntity
     public InvoiceStatus Status { get; set; }
 
     public string? PaymentMethod {get; set;}
+    
+    [MaxLength(500)]
+    public string? Notes { get; set; }
 
     // Navigation properties
     public virtual Reservation Reservation { get; set; } = null!;
