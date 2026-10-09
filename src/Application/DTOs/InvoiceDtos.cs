@@ -57,20 +57,24 @@ public record ChangeInvoiceStatusDto(
 );
 /*
 // Invoice DTOs (referenced but not defined)
-public record CreateInvoiceDto(
-    [Required] int BookingId,
-    [Required] decimal TotalAmount,
-    [Required] decimal Tax,
-    DateTime? DueDate
-);
-
+*/
 public record UpdateInvoiceDto(
-    decimal? TotalAmount,
-    decimal? Tax,
-    DateTime? DueDate,
-    string? Status
+    [Required] string InvoiceNumber,
+    [Required] List<UpdateInvoiceLineItemsDto> LineItems
 );
-
+public record UpdateInvoiceLineItemsDto
+{
+    public int Id { get; set; }
+    [Required] 
+    public int InvoiceId {get; set;}
+    [Required] 
+    public string Description {get; set;}
+    [Required] 
+    public int Quantity {get; set;}
+    [Required] 
+    public decimal UnitPrice {get; set;}
+}
+/*
 public record InvoiceDto(
     int Id,
     int BookingId,

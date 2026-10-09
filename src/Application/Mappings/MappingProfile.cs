@@ -40,6 +40,7 @@ public class MappingProfile : Profile
         //Invoice
         CreateMap<Invoice, CreateInvoiceDto>().ReverseMap();
         CreateMap<LineItemsDto, InvoiceLineItem>();
+        CreateMap<UpdateInvoiceLineItemsDto, InvoiceLineItem>();
         CreateMap<InvoiceLineItem, LineItemsDto>();
         CreateMap<Invoice, ReadInvoiceDto>()
             .ForMember(dest => dest.ReservationId, opt => opt.MapFrom(src => src.ReservationId))

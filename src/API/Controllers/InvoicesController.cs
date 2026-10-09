@@ -56,4 +56,14 @@ public class InvoicesController: ControllerBase
         }
         return Ok(response);
     }
+    [HttpPut("update/{invoiceNumber}")]
+    public async Task<ActionResult<ResponseDto>> UpdateInvoiceLineItem(string invoiceNumber, [FromBody] UpdateInvoiceLineItemsDto dto)
+    {
+        var response = new ResponseDto { Status = "error", Message = BadRequest().ToString() };
+        if(dto != null)
+        {
+            response = await _invoiceservice.UpdateInvoiceLineItem(invoiceNumber, dto);
+        }
+        return Ok(response);
+    }
 }

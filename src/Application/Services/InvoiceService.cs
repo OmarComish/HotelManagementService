@@ -140,6 +140,8 @@ public class InvoiceService: IInvoiceService
                Console.WriteLine($"Invoice found for ID: {reservationId}  ...Adding line item: {dto.Description}, Quantity: {dto.Quantity}, UnitPrice: {dto.UnitPrice}");
                 var lineItem = _mapper.Map<InvoiceLineItem>(dto);
                 lineItem.InvoiceId = invoice.Id;
+                lineItem.CreatedBy = "System"; // or set it to the actual user ID
+                lineItem.CreatedAt = DateTime.UtcNow;
 
                 var results = await _unitOfWork.InvoiceLineItems.AddAsync(lineItem);
                 await _unitOfWork.SaveChangesAsync();
@@ -153,6 +155,56 @@ public class InvoiceService: IInvoiceService
         catch (Exception e)
         {
             response.Message = e.InnerException?.Message;
+        }
+        return response;
+    }
+    public async Task<ResponseDto> UpdateInvoiceLineItem(string invoiceNumber, UpdateInvoiceLineItemsDto dto)
+    {
+        var response = new ResponseDto{Status ="error", Message="Failed to update invoice line item"};
+        try
+        {
+            var invoice = await _unitOfWork.Invoices.GetInvoiceByNumberAsync(invoiceNumber);
+            if(invoice != null)
+            {
+                var lineItem = await _unitOfWork.InvoiceLineItems.GetByIdAsync(dto.Id);
+                if(lineItem != null)
+                {
+                    lineItem.InvoiceId = dto.InvoiceId==0? lineItem.InvoiceId : dto.InvoiceId;
+                    lineItem.Description = dto.Description;
+                    lineItem.Quantity = dto.Quantity;
+                    lineItem.UnitPrice = dto.UnitPrice;
+                    lineItem.UpdatedAt = DateTime.UtcNow;
+                    lineItem.UpdatedBy = "System"; // or set it to the actual user ID
+
+                    _unitOfWork.InvoiceLineItems.Update(lineItem);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    response.Status = "success";
+                    response.Message = "line item updated successfully";
+                }
+                else
+                {
+                    //We assume that the user added new items to the invoice, so we can add them as new line items
+                    var newLineItem = _mapper.Map<InvoiceLineItem>(dto);
+                    newLineItem.InvoiceId = dto.InvoiceId==0? newLineItem.InvoiceId : dto.InvoiceId;
+                    newLineItem.CreatedAt = DateTime.UtcNow;
+                    newLineItem.CreatedBy = "System"; // or set it to the actual user ID
+
+                    await _unitOfWork.InvoiceLineItems.AddAsync(newLineItem);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    response.Status = "success";
+                    response.Message = "Invoice updated successfully";
+                }
+            }
+            else
+            {
+                response.Message = $"No invoice found for reservation ID: {invoiceNumber}";
+            }
+        }
+        catch (Exception e)
+        {
+            response.Message = $"An error occurred while updating the invoice line item. Details: {e.Message}";
         }
         return response;
     }
