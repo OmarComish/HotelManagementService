@@ -23,9 +23,8 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
             .ThenInclude(r => r.Guest)
         .Include(i => i.Reservation)
             .ThenInclude(r => r.Room)
-        .ToListAsync(); //i => i.ReservationId == reservationId);
-
-        Console.WriteLine(invoice.First(i => i.InvoiceNumber == "INV-2026-00001").LineItems.Count);
+            .Where(i => i.Status != InvoiceStatus.voided)
+        .ToListAsync(); 
 
         return invoice;
     }

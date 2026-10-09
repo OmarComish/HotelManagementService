@@ -12,5 +12,5 @@ public interface IInvoiceService
     Task<ResponseDto> MarkInvoiceAsPaidAsync(MarkInvoiceAsPaidDto dto);
     Task<ResponseDto> SendInvoiceAsync(string invoiceNumber);
     Task<ResponseDto> DeleteInvoiceAsync(string invoiceNumber);
-    Task<ResponseDto> UpdateInvoiceLineItem(string invoiceNumber, UpdateInvoiceLineItemsDto dto);
+    Task<ResponseDto> UpdateInvoiceLineItem(string invoiceNumber, List<UpdateInvoiceLineItemsDto> dto);
 }
