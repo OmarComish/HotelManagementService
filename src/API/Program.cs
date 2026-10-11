@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using HotelFlowAPI.Application.Services;
 using HotelmanagementService.Application.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,15 +57,31 @@ builder.Services.AddDbContext<HotelDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
      b => b.MigrationsAssembly("HotelManagementService.Infrastructure")));
 
+
+//Authentication and Authorization
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["IdentityServiceUrl"];
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters.ValidateAudience = false;
+    options.TokenValidationParameters.NameClaimType ="username";
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireAssertion(context =>
+        {
+            var scopeClaim = context.User.FindFirst("scope")?.Value;
+            return scopeClaim != null && scopeClaim.Split(' ').Contains("casemanagement");
+        });
+    });
+});
+
 // Unit of Work & Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-/*builder.Services.AddScoped<IHotelRepository, HotelRepository>();
-builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
-builder.Services.AddScoped<IRoomRepository, RoomRepository>();
-builder.Services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
-builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
-builder.Services.AddScoped<IRestaurantRepository,RestaurantRepository>(); 
-builder.Services.AddScoped<IInvoiceLineItemRepository, InvoiceLineItemRepository>();*/ 
 
 // Application services
 builder.Services.AddScoped<IHotelService, HotelService>();
@@ -78,6 +95,7 @@ builder.Services.AddScoped<IGuestService, GuestService>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IPreferenceService, PreferenceService>();
 builder.Services.AddScoped<IAmenitiesService, AmenitiesService>();
+builder.Services.AddHttpClient<IApiService, ApiService>();
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
