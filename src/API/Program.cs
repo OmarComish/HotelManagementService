@@ -96,6 +96,7 @@ builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IPreferenceService, PreferenceService>();
 builder.Services.AddScoped<IAmenitiesService, AmenitiesService>();
 builder.Services.AddHttpClient<IApiService, ApiService>();
+builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
