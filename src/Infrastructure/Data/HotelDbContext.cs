@@ -30,6 +30,9 @@ public class HotelDbContext : DbContext
     public DbSet<Department> Departments {get; set;}
     public DbSet<InvoiceLineItem> InvoiceLineItems {get; set;}
     public DbSet<OrderType> OrderTypes { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<RolePermission> RolePermissions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

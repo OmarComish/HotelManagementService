@@ -31,7 +31,7 @@ public class ApiService : IApiService
         };
         httpClient.DefaultRequestHeaders.Clear();
 
-        var tokenEndpoint = $"{_config["IdentityService:identityServerUrl"].TrimEnd('/')}/connect/token";
+        var tokenEndpoint = $"{_config["IdentityService:identityServerUrl"]?.TrimEnd('/')}/connect/token";
         Console.WriteLine($"---------url: {tokenEndpoint}");
         var formData = new Dictionary<string, string>
         {

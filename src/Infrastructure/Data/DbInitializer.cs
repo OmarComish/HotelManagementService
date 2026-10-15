@@ -1,4 +1,5 @@
 
+using HotelManagementService.Core.Constants;
 using HotelManagementService.Core.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -67,8 +68,22 @@ public class DbInitializer
         {
             var users = new List<User>
             {
-               new () { Id = 1, Name = "Admin User", Email = "admin@hotel.com", PasswordHash = "$2a$11$hash", Role = "Admin", CreatedAt = DateTime.UtcNow },
-               new () { Id = 2, Name = "Staff Member", Email = "staff@hotel.com", PasswordHash = "$2a$11$hash", Role = "Staff", CreatedAt = DateTime.UtcNow }
+               new () { Id = 1, 
+                FirstName = "Admin",
+                LastName="User", 
+                Email = "admin@hotel.com", 
+                PasswordHash = "$2a$11$hash", 
+                Role = "Admin", 
+                CreatedAt = DateTime.UtcNow,
+                },
+               new () { Id = 2, 
+                FirstName = "Staff", 
+                LastName="Member", 
+                Email = "staff@hotel.com", 
+                PasswordHash = "$2a$11$hash", 
+                Role = "Staff", 
+                CreatedAt = DateTime.UtcNow 
+               }
             };
             context.AddRange(users);
             context.SaveChanges();
@@ -343,6 +358,156 @@ public class DbInitializer
 
             };
             context.AddRange(menuitems);
+            context.SaveChanges();
+        }
+        if(!context.Permissions.Any())
+        {
+            var permissions = new Dictionary<string, string>
+            {
+                [RbacPermissions.UsersView] = "View Users",
+                [RbacPermissions.UsersCreate] = "Create Users",
+                [RbacPermissions.UsersEdit] = "Edit Users",
+                [RbacPermissions.UsersDelete] = "Delete Users",
+                [RbacPermissions.UsersActivate] = "Activate Users",
+                [RbacPermissions.UsersDeactivate] = "Deactivate Users",
+                [RbacPermissions.UsersResetPassword] = "Reset User Password",
+                [RbacPermissions.UsersChangeRole] = "Change User Role",
+
+                [RbacPermissions.RolesView] = "View Roles",
+                [RbacPermissions.RolesCreate] = "Create Roles",
+                [RbacPermissions.RolesEdit] = "Edit Roles",
+                [RbacPermissions.RolesDelete] = "Delete Roles",
+                [RbacPermissions.RolesAssignPermissions] = "Assign Permissions",
+
+                [RbacPermissions.SettingsView] = "View Settings",
+                [RbacPermissions.SettingsEdit] = "Edit Settings",
+
+                [RbacPermissions.AuditLogsView] = "View Audit Logs"
+            };
+
+            var existingKeys = context.Permissions.Select(p=>p.Key).ToList();
+            var newPermissions = permissions
+                .Where(kvp => !existingKeys.Contains(kvp.Key))
+                .Select(kvp => new Permission
+                {
+                    Key = kvp.Key,  
+                    Name = kvp.Value,
+                    Description = kvp.Value,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+            if(newPermissions.Count == 0) return;
+         
+            context.AddRange(newPermissions);
+            context.SaveChanges();
+        }
+        if(!context.Roles.Any())
+        {
+            var roles = new List<Role>
+            {
+                new () { Key = "Admin", 
+                         Name = "Administrator", 
+                         Description = "System Administrator with full access", 
+                         IsActive = true, 
+                         IsSystem = true, 
+                         IsSuperAdmin = true, 
+                         CreatedAt = DateTime.UtcNow 
+                        },
+                new () { Key = "Staff", 
+                         Name = "Staff Member", 
+                         Description = "Hotel Staff with limited access", 
+                         IsActive = true, 
+                         IsSystem = false, 
+                         IsSuperAdmin = false, 
+                         CreatedAt = DateTime.UtcNow 
+                         },
+                          new Role
+                        {
+                            Key = "front_desk",
+                            Name = "Front Desk",
+                            Description = "Front desk operations",
+                            IsActive = true,
+                            IsSystem = true,
+                            IsSuperAdmin = false, 
+                            CreatedAt = DateTime.UtcNow 
+                        },
+                        new Role
+                        {
+                            Key = "housekeeping",
+                            Name = "Housekeeping",
+                            Description = "Housekeeping operations",
+                            IsActive = true,
+                            IsSystem = true,
+                            IsSuperAdmin = false, 
+                            CreatedAt = DateTime.UtcNow 
+                        },
+                        new Role
+                        {
+                            Key = "restaurant",
+                            Name = "Restaurant",
+                            Description = "Restaurant operations",
+                            IsActive = true,
+                            IsSystem = true,
+                            IsSuperAdmin = false, 
+                            CreatedAt = DateTime.UtcNow 
+                        }
+            };
+            context.AddRange(roles);
+            context.SaveChanges();
+        }
+        if(!context.RolePermissions.Any())
+        {
+            var roles = context.Roles.ToDictionary(r=>r.Key);
+            var permissions = context.Permissions.ToDictionary(p=>p.Key);
+            var assignments = new Dictionary<string,string[]>
+            {
+                ["admin"] = permissions.Keys.ToArray(),
+                ["manager"] = [
+                    RbacPermissions.SettingsView,
+                    RbacPermissions.UsersView,
+                    RbacPermissions.RolesView,
+                    RbacPermissions.AuditLogsView
+                ]
+            };
+
+            var existingAssignments = context.RolePermissions
+            .Select(rp=> new
+            {
+                rp.RoleId,
+                rp.PermissionId
+            })
+            .ToList();
+
+            var newAssignments = new List<RolePermission>();
+
+            foreach(var assignment in assignments)
+            {
+                if(!roles.TryGetValue(assignment.Key, out var role))
+                   continue;
+                foreach(var permissionkey in assignment.Value)
+                {
+                    if(!permissions.TryGetValue(permissionkey, out var permission))
+                      continue;
+
+                    var alreadyExist = existingAssignments.Exists(x=>
+                      x.RoleId == role.Id && 
+                      x.PermissionId == permission.Id);
+
+                    if(alreadyExist)
+                      continue;
+
+                    newAssignments.Add(new RolePermission
+                    {
+                        RoleId = role.Id,
+                        PermissionId = permission.Id
+                    });
+                }
+            }
+            
+            if(newAssignments.Count == 0)
+             return;
+
+            context.RolePermissions.AddRange(newAssignments);
             context.SaveChanges();
         }
     }

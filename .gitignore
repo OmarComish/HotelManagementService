@@ -19,3 +19,4 @@ appsettings.Development.json
 *.project.lock.json
 *.nuget.targets
 *.nuget.props
+src/Infrastructure/Data/Migrations/*
