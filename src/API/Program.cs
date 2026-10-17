@@ -10,6 +10,8 @@ using System.Reflection;
 using HotelFlowAPI.Application.Services;
 using HotelmanagementService.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using HotelmanagementService.API.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +99,10 @@ builder.Services.AddScoped<IPreferenceService, PreferenceService>();
 builder.Services.AddScoped<IAmenitiesService, AmenitiesService>();
 builder.Services.AddHttpClient<IApiService, ApiService>();
 builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
@@ -113,6 +119,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging() || app.Enviro
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

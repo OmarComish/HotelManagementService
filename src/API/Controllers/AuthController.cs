@@ -1,5 +1,6 @@
 using HotelManagementService.Application.DTOs;
 using HotelManagementService.Application.Interfaces;
+using HotelManagementService.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +11,11 @@ namespace HotelManagementService.API.Controllers;
 public class AuthController: ControllerBase
 {
     private readonly IAuthenticationService _authservice;
-    public AuthController(IAuthenticationService authservice)
+    private readonly IPermissionService _permissionService;
+    public AuthController(IAuthenticationService authservice, IPermissionService permissionService)
     {
         _authservice = authservice;
+        _permissionService = permissionService;
     }
     [HttpPost("Signin")]
     public async Task<ActionResult<AuthResponseDto>> SignIn([FromBody] LogInRequestDto request)
@@ -35,5 +38,25 @@ public class AuthController: ControllerBase
         response = await _authservice.RegisterUser(dto);
         return Ok(response);
 
+    }
+    [Authorize]
+    [HttpGet("Permissions")]
+    public async Task<IActionResult> GetMyPermissions(CancellationToken ct)
+    {
+        var username = User.FindFirst("username")?.Value;
+
+        if (string.IsNullOrWhiteSpace(username))
+        return Unauthorized();
+
+        var access = await _permissionService.GetAccessAsync(username, ct);
+        if(access is null)
+          return Unauthorized();
+
+        return Ok(new
+        {
+           username = access.Username,
+           role = access.RoleKey,
+           permission = access.Permissions 
+        });
     }
 }

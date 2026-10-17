@@ -64,6 +64,18 @@ public class DbInitializer
             context.AddRange(rooms);
             context.SaveChanges();
         }
+        if(!context.Employees.Any())
+        {
+            var employees = new List<Employee>
+            {
+                new () {Id= 1, DepartmentId = 1, FirstName ="John", LastName ="Doe", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
+                new () {Id= 2, DepartmentId = 2, FirstName ="Mary", LastName ="Johnson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
+                new () {Id= 3, DepartmentId = 3, FirstName ="Sarah", LastName ="Wilson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
+                new () {Id= 4, DepartmentId = 4, FirstName ="Tracy", LastName ="Morgan", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"}  
+            };
+            context.AddRange(employees);
+            context.SaveChanges();
+        }
         if(!context.Users.Any())
         {
             var users = new List<User>
@@ -75,14 +87,16 @@ public class DbInitializer
                 PasswordHash = "$2a$11$hash", 
                 Role = "Admin", 
                 CreatedAt = DateTime.UtcNow,
+                EmployeeId = 1, 
                 },
                new () { Id = 2, 
                 FirstName = "Staff", 
                 LastName="Member", 
                 Email = "staff@hotel.com", 
-                PasswordHash = "$2a$11$hash", 
+                PasswordHash = "$2a$11$hash",
                 Role = "Staff", 
-                CreatedAt = DateTime.UtcNow 
+                CreatedAt = DateTime.UtcNow,
+                EmployeeId = 2, 
                }
             };
             context.AddRange(users);
@@ -149,18 +163,6 @@ public class DbInitializer
                 new ()  {Id = 8, Name="Extra towels", CreatedAt = DateTime.UtcNow}
             };
             context.AddRange(preferences);
-            context.SaveChanges();
-        }
-        if(!context.Employees.Any())
-        {
-            var employees = new List<Employee>
-            {
-                new () {Id= 1, DepartmentId = 1, FirstName ="John", LastName ="Doe", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
-                new () {Id= 2, DepartmentId = 2, FirstName ="Mary", LastName ="Johnson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
-                new () {Id= 3, DepartmentId = 3, FirstName ="Sarah", LastName ="Wilson", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"},
-                new () {Id= 4, DepartmentId = 4, FirstName ="Tracy", LastName ="Morgan", CreatedAt = DateTime.UtcNow, CreatedBy = "Admin"}  
-            };
-            context.AddRange(employees);
             context.SaveChanges();
         }
         if(!context.TaskTypes.Any())
@@ -396,12 +398,12 @@ public class DbInitializer
                     CreatedAt = DateTime.UtcNow
                 }).ToList();
 
-            if(newPermissions.Count == 0) return;
+            if(newPermissions.Count > 0) return;
          
             context.AddRange(newPermissions);
             context.SaveChanges();
         }
-        if(!context.Roles.Any())
+        if(!context.RolePermissions.Any())
         {
             var roles = new List<Role>
             {
@@ -455,60 +457,94 @@ public class DbInitializer
             context.AddRange(roles);
             context.SaveChanges();
         }
-        if(!context.RolePermissions.Any())
+        
+        if(context.Roles.Any())
         {
-            var roles = context.Roles.ToDictionary(r=>r.Key);
-            var permissions = context.Permissions.ToDictionary(p=>p.Key);
-            var assignments = new Dictionary<string,string[]>
+           Console.WriteLine("Checking RolePermissions...");
+
+            var roles = context.Roles
+                .ToDictionary(r => r.Key, StringComparer.OrdinalIgnoreCase);
+
+            var permissions = context.Permissions
+                .ToDictionary(p => p.Key, StringComparer.OrdinalIgnoreCase);
+
+            var assignments = new Dictionary<string, string[]>
             {
-                ["admin"] = permissions.Keys.ToArray(),
-                ["manager"] = [
+                ["Admin"] = permissions.Keys.ToArray(),
+
+                ["Staff"] =
+                [
                     RbacPermissions.SettingsView,
                     RbacPermissions.UsersView,
-                    RbacPermissions.RolesView,
-                    RbacPermissions.AuditLogsView
+                    RbacPermissions.RolesView
                 ]
             };
 
             var existingAssignments = context.RolePermissions
-            .Select(rp=> new
-            {
-                rp.RoleId,
-                rp.PermissionId
-            })
-            .ToList();
+                .Select(rp => new
+                {
+                    rp.RoleId,
+                    rp.PermissionId
+                })
+                .ToHashSet();
 
             var newAssignments = new List<RolePermission>();
 
-            foreach(var assignment in assignments)
+            foreach (var assignment in assignments)
             {
-                if(!roles.TryGetValue(assignment.Key, out var role))
-                   continue;
-                foreach(var permissionkey in assignment.Value)
+                if (!roles.TryGetValue(assignment.Key, out var role))
                 {
-                    if(!permissions.TryGetValue(permissionkey, out var permission))
-                      continue;
+                    Console.WriteLine(
+                        $"Role '{assignment.Key}' was not found.");
+                    continue;
+                }
 
-                    var alreadyExist = existingAssignments.Exists(x=>
-                      x.RoleId == role.Id && 
-                      x.PermissionId == permission.Id);
+                foreach (var permissionKey in assignment.Value)
+                {
+                    if (!permissions.TryGetValue(
+                            permissionKey, out var permission))
+                    {
+                        Console.WriteLine(
+                            $"Permission '{permissionKey}' was not found.");
+                        continue;
+                    }
 
-                    if(alreadyExist)
-                      continue;
+                    var alreadyExists = existingAssignments.Any(x =>
+                        x.RoleId == role.Id &&
+                        x.PermissionId == permission.Id);
+
+                    if (alreadyExists)
+                        continue;
 
                     newAssignments.Add(new RolePermission
                     {
                         RoleId = role.Id,
                         PermissionId = permission.Id
                     });
+
+                    // Prevent duplicate pairs within this batch too.
+                    existingAssignments.Add(new
+                    {
+                        RoleId = role.Id,
+                        PermissionId = permission.Id
+                    });
                 }
             }
-            
-            if(newAssignments.Count == 0)
-             return;
 
-            context.RolePermissions.AddRange(newAssignments);
-            context.SaveChanges();
+            if (newAssignments.Count > 0)
+            {
+                context.RolePermissions.AddRange(newAssignments);
+                context.SaveChanges();
+
+                Console.WriteLine(
+                    $"Added {newAssignments.Count} RolePermissions.");
+            }
+            else
+            {
+                Console.WriteLine(
+                    "No new RolePermissions to add.");
+            }
         }
+        
     }
 }
