@@ -2,6 +2,7 @@ using HotelFlowAPI.Core.Interfaces;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 using HotelManagementService.Infrastructure.Data;
+using HotelManagementServices.Core.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace HotelManagementService.Infrastructure.Repositories;
@@ -31,6 +32,7 @@ public class UnitOfWork : IUnitOfWork
     public IRestaurantTableRepository RestaurantTables {get;}
     public IOrderRepository Orders {get;}
     public IOrderTypesRepository OrderTypes {get;}
+    public IRoleRepository Roles {get;}
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -55,6 +57,7 @@ public class UnitOfWork : IUnitOfWork
         RestaurantTables = new RestaurantTableRepository(_context);
         Orders = new OrderRepository(_context);
         OrderTypes = new OrderTypeRepository(_context);
+        Roles = new RoleRepository(_context);
     }
 
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();

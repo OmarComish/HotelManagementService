@@ -1,5 +1,6 @@
 using HotelFlowAPI.Core.Interfaces;
 using HotelManagementService.Core.Entities;
+using HotelManagementServices.Core.Interfaces;
 
 namespace HotelManagementService.Core.Interfaces;
 
@@ -25,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     IRestaurantTableRepository RestaurantTables {get;}
     IRestaurantOrderRepository RestaurantOrders {get;}
     IOrderTypesRepository OrderTypes {get;}
+    IRoleRepository Roles {get;}
     
     //Task<int> SaveChangesAsync();
     Task<int> SaveChangesAsync();

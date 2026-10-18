@@ -102,6 +102,7 @@ builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
