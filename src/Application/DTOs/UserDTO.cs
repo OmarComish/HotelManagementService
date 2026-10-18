@@ -229,3 +229,20 @@ namespace HotelManagementService.Application.DTOs;
         [Compare("NewPassword", ErrorMessage = "New password and confirmation password do not match")]
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
+
+    public record ManagedUserDto(
+        int Id,
+        string FirstName,
+        string LastName,
+        string Name,
+        string Username,
+        string Email,
+        string? RoleKey,
+        string? RoleName,
+        string Status,            // "active" | "inactive" (other RecordStatus values come through lowercase)
+        DateTime CreatedAt,
+        DateTime? UpdatedAt);
+
+    public record PagedResult<T>(IReadOnlyList<T> Data, int Total, int Page, int PageSize);
+    public record ChangeRoleRequest(string RoleKey);
+    public record SetStatusRequest(string Status);

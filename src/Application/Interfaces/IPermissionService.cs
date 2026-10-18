@@ -2,7 +2,8 @@ namespace HotelManagementService.Application.Interfaces;
 public record UserAccess(
     string Username,
     string? RoleKey,
-    IReadOnlyCollection<string> Permissions);
+    IReadOnlyCollection<string> Permissions,
+    bool isSuperAdmin = false);
 public interface IPermissionService
 {
     /// Returns null if the user does not exist. Returns an empty permission set

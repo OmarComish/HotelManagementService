@@ -30,7 +30,7 @@ public class PermissionService: IPermissionService
           .Select(rp => rp.Permission.Key)
           .ToList();
 
-        return new UserAccess(user.Username, role.Key, permissions);
+        return new UserAccess(user.Username, role.Key, permissions, role.IsSuperAdmin);
 
     }
 }

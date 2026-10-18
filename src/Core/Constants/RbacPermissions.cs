@@ -9,7 +9,6 @@ public static class RbacPermissions
     public const string UsersDeactivate = "Users.Deactivate";
     public const string UsersResetPassword = "Users.ResetPassword";
     public const string UsersChangeRole = "Users.ChangeRole";
-
     public const string RolesView = "Roles.View";
     public const string RolesCreate = "Roles.Create";
     public const string RolesEdit = "Roles.Edit";
