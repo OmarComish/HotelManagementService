@@ -60,7 +60,7 @@ public class RolesController : ControllerBase
     [HasPermission(RbacPermissions.RolesDelete)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        await _roleService.DeleteRoleAsync(id, ct);
+        await _roleService.DeleteRoleAsync(ActorUsername,id, ct);
         return NoContent();
     }
 }

@@ -12,6 +12,8 @@ using HotelmanagementService.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using HotelmanagementService.API.Authorization;
+using HotelmanagementService.API.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -104,6 +106,9 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IRequestContext, HttpRequestContext>();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

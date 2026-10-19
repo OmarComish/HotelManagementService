@@ -13,11 +13,14 @@ public class UserManagementService : IUserManagementService
 
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPermissionService _permissionService;
+    private readonly IAuditService _audit;
 
-    public UserManagementService(IUnitOfWork unitOfWork, IPermissionService permissionService)
+    public UserManagementService(IUnitOfWork unitOfWork, IPermissionService permissionService,
+    IAuditService audit)
     {
         _unitOfWork = unitOfWork;
         _permissionService = permissionService;
+        _audit = audit;
     }
 
     /* ---------- reads ---------- */
@@ -80,10 +83,18 @@ public class UserManagementService : IUserManagementService
         if (userIsSuper && !role.IsSuperAdmin &&
             await _unitOfWork.Users.CountActiveSuperAdminsAsync(ct) <= 1)
             throw new RbacException(409, "This is the last active administrator - the role cannot be removed.");
-
+        
+        var previousRoleKey = user.AssignedRole?.Key;
         user.RoleId = role.Id;
         user.UpdatedAt = DateTime.UtcNow;
         user.UpdatedBy = actor.Username;
+
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            "user.role_changed", "user", user.Id.ToString(), $"{user.FirstName} {user.LastName}",
+            new { role = previousRoleKey },
+            new { role = role.Key }));
+
         await _unitOfWork.SaveChangesAsync();
 
         return (await GetUserAsync(id, ct))!;
@@ -116,10 +127,19 @@ public class UserManagementService : IUserManagementService
                 await _unitOfWork.Users.CountActiveSuperAdminsAsync(ct) <= 1)
                 throw new RbacException(409, "The last active administrator cannot be deactivated or locked.");
         }
-
+        
+        var previousStatus = user.Status;
         user.Status = target;
         user.UpdatedAt = DateTime.UtcNow;
         user.UpdatedBy = actor.Username;
+
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            target == RecordStatus.Active ? "user.activated" : "user.deactivated",
+            "user", user.Id.ToString(), $"{user.FirstName} {user.LastName}",
+            new { status = StatusToString(previousStatus) },
+            new { status = StatusToString(target) }));
+
         await _unitOfWork.SaveChangesAsync();
 
         return (await GetUserAsync(id, ct))!;
@@ -138,6 +158,12 @@ public class UserManagementService : IUserManagementService
         if (user.AssignedRole?.IsSuperAdmin == true &&
             await _unitOfWork.Users.CountActiveSuperAdminsAsync(ct) <= 1)
             throw new RbacException(409, "The last active administrator cannot be deleted.");
+         
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            "user.deleted", "user", user.Id.ToString(), $"{user.FirstName} {user.LastName}",
+            new { username = user.Username, email = user.Email, role = user.AssignedRole?.Key },
+            New: null));
 
         _unitOfWork.Users.Delete(user);
         await _unitOfWork.SaveChangesAsync();

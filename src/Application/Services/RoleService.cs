@@ -13,10 +13,13 @@ public class RoleService : IRoleService
     private const string AssignPermissionsKey = "Roles.AssignPermissions";
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPermissionService _permissionService;
-    public RoleService(IUnitOfWork unitOfWork, IPermissionService permissionService)
+    private readonly IAuditService _audit;
+    public RoleService(IUnitOfWork unitOfWork, IPermissionService permissionService,
+    IAuditService audit)
     {
         _unitOfWork = unitOfWork;
         _permissionService =permissionService;
+        _audit = audit;
     }
 
     public async Task<IReadOnlyList<RoleDto>> GetRolesAsync(CancellationToken ct = default)
@@ -74,8 +77,30 @@ public class RoleService : IRoleService
                 .ToList()
         };
 
-        await _unitOfWork.Roles.AddAsync(role);
-        await _unitOfWork.SaveChangesAsync();
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            await _unitOfWork.Roles.AddAsync(role);
+            await _unitOfWork.SaveChangesAsync();   // role.Id is generated here
+
+            await _audit.RecordAsync(new AuditEntry(
+                actor.Username, actor.FullName ?? actor.Username,
+                "role.created", "role", role.Id.ToString(), role.Name,
+                Previous: null,
+                New: new
+                {
+                    key = role.Key,
+                    status = isActive ? "active" : "inactive",
+                    permissions = permissions.Select(p => p.Key).OrderBy(k => k).ToList()
+                }));
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
 
         return (await GetRoleAsync(role.Id, ct))!;
     }
@@ -106,6 +131,13 @@ public class RoleService : IRoleService
         if (role.IsActive && !isActive && await _unitOfWork.Roles.HasUsersAsync(role.Id, ct))
             throw new RbacException(409, "Reassign the users in this role before deactivating it.");
 
+        var previous = new
+        {
+            name = role.Name,
+            status = role.IsActive ? "active" : "inactive",
+            permissions = current.OrderBy(k => k).ToList()
+        };
+        
         role.Name = name;
         role.Description = CleanDescription(input.Description);
 
@@ -127,13 +159,27 @@ public class RoleService : IRoleService
 
         role.UpdatedAt = DateTime.UtcNow;
         role.UpdatedBy = actor.Username;
+
+        await _audit.RecordAsync(new AuditEntry(
+        actor.Username, actor.FullName ?? actor.Username,
+        permsChanged ? "role.permissions_changed" : "role.updated",
+        "role", role.Id.ToString(), role.Name,
+        previous,
+        new
+        {
+            name = role.Name,
+            status = role.IsActive ? "active" : "inactive",
+            permissions = (permsChanged ? requested : current).OrderBy(k => k).ToList()
+        }));
         await _unitOfWork.SaveChangesAsync();
 
         return (await GetRoleAsync(role.Id, ct))!;
     }
 
-    public async Task DeleteRoleAsync(int id, CancellationToken ct = default)
+    public async Task DeleteRoleAsync(string actorUsername, int id, CancellationToken ct = default)
     {
+        var actor = await GetActorAsync(actorUsername, ct);
+
         var role = await _unitOfWork.Roles.GetByIdForUpdateAsync(id, ct)
             ?? throw new RbacException(404, "Role not found");
 
@@ -142,8 +188,20 @@ public class RoleService : IRoleService
         if (await _unitOfWork.Roles.HasUsersAsync(role.Id, ct))
             throw new RbacException(409, "Reassign the users in this role before deleting it.");
 
+        var previous = new
+        {
+            key = role.Key,
+            permissions = role.RolePermissions.Select(rp => rp.Permission.Key).OrderBy(k => k).ToList()
+        };
+
         _unitOfWork.Roles.RemoveRolePermissions(role.RolePermissions.ToList());
         _unitOfWork.Roles.Delete(role);
+
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            "role.deleted", "role", role.Id.ToString(), role.Name,
+            previous, New: null));
+
         await _unitOfWork.SaveChangesAsync();
     }
 

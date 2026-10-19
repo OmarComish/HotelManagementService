@@ -33,6 +33,7 @@ public class UnitOfWork : IUnitOfWork
     public IOrderRepository Orders {get;}
     public IOrderTypesRepository OrderTypes {get;}
     public IRoleRepository Roles {get;}
+    public IAuditLogRepository AuditLogs {get;}
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -58,6 +59,8 @@ public class UnitOfWork : IUnitOfWork
         Orders = new OrderRepository(_context);
         OrderTypes = new OrderTypeRepository(_context);
         Roles = new RoleRepository(_context);
+        AuditLogs = new AuditLogRepository(_context);
+
     }
 
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
