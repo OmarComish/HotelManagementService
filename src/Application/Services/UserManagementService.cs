@@ -3,6 +3,7 @@ using HotelManagementService.Application.Exceptions;
 using HotelManagementService.Application.Interfaces;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotelManagementService.Application.Services;
 
@@ -55,6 +56,55 @@ public class UserManagementService : IUserManagementService
     {
         var user = await _unitOfWork.Users.GetByIdWithRoleAsync(id, ct);
         return user is null ? null : ToDto(user);
+    }
+
+    public async Task<ManagedUserDto> UpdateUserAsync(
+        string actorUsername, int id, UpdateUserRequest request, CancellationToken ct = default)
+    {
+        var actor = await GetActorAsync(actorUsername, ct);
+
+        var user = await _unitOfWork.Users.GetByIdForUpdateAsync(id, ct)
+            ?? throw new RbacException(404, "User not found");
+
+        var firstName = ValidateName(request.FirstName, "First name");
+        var lastName = ValidateName(request.LastName, "Last name");
+        var email = ValidateEmail(request.Email);
+
+        if (await _unitOfWork.Users.EmailExistsAsync(email, user.Id, ct))
+            throw new RbacException(409, "A user with that email already exists");
+
+        var previous = new { firstName = user.FirstName, lastName = user.LastName, email = user.Email };
+
+        user.FirstName = firstName;
+        user.LastName = lastName;
+        user.Email = email;
+        user.UpdatedAt = DateTime.UtcNow;
+        user.UpdatedBy = actor.Username;
+
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            "user.updated", "user", user.Id.ToString(), $"{firstName} {lastName}",
+            previous,
+            new { firstName, lastName, email }));
+
+        await _unitOfWork.SaveChangesAsync();
+        return (await GetUserAsync(id, ct))!;
+    }
+
+    private static string ValidateName(string? raw, string label)
+    {
+        var value = (raw ?? string.Empty).Trim();
+        if (value.Length == 0 || value.Length > 50)
+            throw new RbacException(422, $"{label} is required (max 50 characters)");
+        return value;
+    }
+
+    private static string ValidateEmail(string? raw)
+    {
+        var value = (raw ?? string.Empty).Trim();
+        if (value.Length == 0 || value.Length > 255 || !new EmailAddressAttribute().IsValid(value))
+            throw new RbacException(422, "Enter a valid email address");
+        return value;
     }
 
     /* ---------- mutations ---------- */

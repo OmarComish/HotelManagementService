@@ -49,6 +49,7 @@ public class HotelDbContext : DbContext
         });
 
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(HotelDbContext).Assembly);
         
     }
  

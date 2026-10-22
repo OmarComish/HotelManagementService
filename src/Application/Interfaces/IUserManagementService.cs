@@ -9,4 +9,5 @@ public interface IUserManagementService
     Task<ManagedUserDto> ChangeRoleAsync(string actorUsername, int id, string roleKey, CancellationToken ct = default);
     Task<ManagedUserDto> SetStatusAsync(string actorUsername, int id, string status, CancellationToken ct = default);
     Task DeleteUserAsync(string actorUsername, int id, CancellationToken ct = default);
+    Task<ManagedUserDto> UpdateUserAsync(string actorUsername, int id, UpdateUserRequest request, CancellationToken ct = default);
 }

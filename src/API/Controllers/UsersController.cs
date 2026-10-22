@@ -56,4 +56,10 @@ public class UsersController : ControllerBase
         await _users.DeleteUserAsync(ActorUsername, id, ct);
         return NoContent();
     }
+    
+    [HttpPut("{id:int}")]
+    [HasPermission(RbacPermissions.UsersEdit)]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request, CancellationToken ct) =>
+        Ok(await _users.UpdateUserAsync(ActorUsername, id, request, ct));
+    
 }

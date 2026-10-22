@@ -80,21 +80,23 @@ public class DbInitializer
         {
             var users = new List<User>
             {
-               new () { Id = 1, 
-                FirstName = "Admin",
-                LastName="User", 
-                Email = "admin@hotel.com", 
+               new () { Id = 1,
+                Username = "bob", 
+                FirstName = "Bob",
+                LastName="Dylan", 
+                Email = "bob.dylan@hotel.com", 
                 PasswordHash = "$2a$11$hash", 
-                Role = "Admin", 
+                Role = "Staff", 
                 CreatedAt = DateTime.UtcNow,
                 EmployeeId = 1, 
                 },
-               new () { Id = 2, 
-                FirstName = "Staff", 
-                LastName="Member", 
-                Email = "staff@hotel.com", 
+               new () { Id = 2,
+                Username="alice", 
+                FirstName = "Alice", 
+                LastName="Mphempo", 
+                Email = "alice.mphempo@hotel.com", 
                 PasswordHash = "$2a$11$hash",
-                Role = "Staff", 
+                Role = "Admin", 
                 CreatedAt = DateTime.UtcNow,
                 EmployeeId = 2, 
                }
@@ -362,7 +364,7 @@ public class DbInitializer
             context.AddRange(menuitems);
             context.SaveChanges();
         }
-        if(!context.Permissions.Any())
+       /*if(!context.Permissions.Any())
         {
             var permissions = new Dictionary<string, string>
             {
@@ -457,8 +459,7 @@ public class DbInitializer
             context.AddRange(roles);
             context.SaveChanges();
         }
-        
-        if(context.Roles.Any())
+        if(!context.Roles.Any())
         {
            Console.WriteLine("Checking RolePermissions...");
 
@@ -545,6 +546,177 @@ public class DbInitializer
                     "No new RolePermissions to add.");
             }
         }
-        
+        */
+        SeedRbac(context);
+    }
+    private static void SeedRbac(HotelDbContext context)
+    {
+        // 1. Permission catalog: defined in code, so always ensure every key exists.
+        var permissionDefinitions = new Dictionary<string, string>
+        {
+            [RbacPermissions.UsersView] = "View Users",
+            [RbacPermissions.UsersCreate] = "Create Users",
+            [RbacPermissions.UsersEdit] = "Edit Users",
+            [RbacPermissions.UsersDelete] = "Delete Users",
+            [RbacPermissions.UsersActivate] = "Activate Users",
+            [RbacPermissions.UsersDeactivate] = "Deactivate Users",
+            [RbacPermissions.UsersResetPassword] = "Reset User Password",
+            [RbacPermissions.UsersChangeRole] = "Change User Role",
+
+            [RbacPermissions.RolesView] = "View Roles",
+            [RbacPermissions.RolesCreate] = "Create Roles",
+            [RbacPermissions.RolesEdit] = "Edit Roles",
+            [RbacPermissions.RolesDelete] = "Delete Roles",
+            [RbacPermissions.RolesAssignPermissions] = "Assign Permissions",
+
+            [RbacPermissions.SettingsView] = "View Settings",
+            [RbacPermissions.SettingsEdit] = "Edit Settings",
+
+            [RbacPermissions.AuditLogsView] = "View Audit Logs"
+        };
+
+        var existingPermissionKeys = context.Permissions
+            .Select(p => p.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var missingPermissions = permissionDefinitions
+            .Where(kvp => !existingPermissionKeys.Contains(kvp.Key))
+            .Select(kvp => new Permission
+            {
+                Key = kvp.Key,
+                Name = kvp.Value,
+                Description = kvp.Value,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = "system"
+            })
+            .ToList();
+
+        if (missingPermissions.Count > 0)
+        {
+            context.Permissions.AddRange(missingPermissions);
+            context.SaveChanges();
+        }
+
+        // 2. Roles: add any that are missing, matched by key (same as rbac.ts).
+        var roleDefinitions = new[]
+        {
+            (Key: "admin", Name: "Administrator",
+             Description: "Full system access including settings, users, roles and audit logs.", IsSuperAdmin: true),
+            (Key: "manager", Name: "Manager",
+             Description: "Operational oversight with read-only access to users, roles and audit logs.", IsSuperAdmin: false),
+            (Key: "front_desk", Name: "Front Desk",
+             Description: "Reception operations: check-in/out, reservations, guests and billing.", IsSuperAdmin: false),
+            (Key: "housekeeping", Name: "Housekeeping",
+             Description: "Housekeeping operations: room status and cleaning tasks.", IsSuperAdmin: false),
+            (Key: "restaurant", Name: "Restaurant",
+             Description: "Restaurant operations: tables, menu and orders.", IsSuperAdmin: false)
+        };
+
+        var existingRoleKeys = context.Roles
+            .Select(r => r.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var missingRoles = roleDefinitions
+            .Where(d => !existingRoleKeys.Contains(d.Key))
+            .Select(d => new Role
+            {
+                Key = d.Key,
+                Name = d.Name,
+                Description = d.Description,
+                IsActive = true,
+                IsSystem = true,
+                IsSuperAdmin = d.IsSuperAdmin,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = "system"
+            })
+            .ToList();
+
+        if (missingRoles.Count > 0)
+        {
+            context.Roles.AddRange(missingRoles);
+            context.SaveChanges();
+        }
+
+        var newRoleKeys = missingRoles
+            .Select(r => r.Key)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // 3. Role permissions.
+        var roles = context.Roles.ToDictionary(r => r.Key, StringComparer.OrdinalIgnoreCase);
+        var permissions = context.Permissions.ToDictionary(p => p.Key, StringComparer.OrdinalIgnoreCase);
+
+        var assignments = new Dictionary<string, string[]>
+        {
+            ["admin"] = permissionDefinitions.Keys.ToArray(),
+            ["manager"] = new[]
+            {
+                RbacPermissions.SettingsView,
+                RbacPermissions.UsersView,
+                RbacPermissions.RolesView,
+                RbacPermissions.AuditLogsView
+            }
+        };
+
+        var existingPairs = context.RolePermissions
+            .Select(rp => new { rp.RoleId, rp.PermissionId })
+            .AsEnumerable()
+            .Select(x => (x.RoleId, x.PermissionId))
+            .ToHashSet();
+
+        var newPairs = new List<RolePermission>();
+
+        foreach (var (roleKey, permissionKeys) in assignments)
+        {
+            if (!roles.TryGetValue(roleKey, out var role))
+                throw new InvalidOperationException($"RBAC seed: role '{roleKey}' was not found.");
+
+            // The super admin always holds the full catalog. Every other role gets its
+            // defaults only when it is first created, so restarts never undo edits
+            // made through the roles API.
+            if (!role.IsSuperAdmin && !newRoleKeys.Contains(roleKey))
+                continue;
+
+            foreach (var permissionKey in permissionKeys)
+            {
+                if (!permissions.TryGetValue(permissionKey, out var permission))
+                    throw new InvalidOperationException($"RBAC seed: permission '{permissionKey}' was not found.");
+
+                if (existingPairs.Add((role.Id, permission.Id)))
+                {
+                    newPairs.Add(new RolePermission
+                    {
+                        RoleId = role.Id,
+                        PermissionId = permission.Id,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = "system"
+                    });
+                }
+            }
+        }
+
+        if (newPairs.Count > 0)
+        {
+            context.RolePermissions.AddRange(newPairs);
+            context.SaveChanges();
+        }
+
+        // 4. Backfill Users.RoleId from the legacy Role string.
+        var usersWithoutRole = context.Users.Where(u => u.RoleId == null).ToList();
+        if (usersWithoutRole.Count > 0)
+        {
+            foreach (var user in usersWithoutRole)
+            {
+                var key = user.Role switch
+                {
+                    "Admin" => "admin",
+                    "Staff" => "manager",
+                    _ => user.Role.ToLowerInvariant()
+                };
+
+                if (roles.TryGetValue(key, out var matchedRole))
+                    user.RoleId = matchedRole.Id;
+            }
+            context.SaveChanges();
+        }
     }
 }

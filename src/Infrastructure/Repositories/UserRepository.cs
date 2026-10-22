@@ -65,4 +65,10 @@ public class UserRepository: GenericRepository<User>, IUsersRepository
         _dbSet.CountAsync(u => u.Status == RecordStatus.Active
                             && u.AssignedRole != null
                             && u.AssignedRole.IsSuperAdmin, ct);
+
+    public Task<bool> EmailExistsAsync(string email, int excludeUserId, CancellationToken ct = default)
+    {
+        var lower = email.ToLowerInvariant();
+        return _dbSet.AnyAsync(u => u.Id != excludeUserId && u.Email.ToLower() == lower, ct);
+    }
 }
