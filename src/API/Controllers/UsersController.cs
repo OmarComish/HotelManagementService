@@ -61,5 +61,21 @@ public class UsersController : ControllerBase
     [HasPermission(RbacPermissions.UsersEdit)]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserRequest request, CancellationToken ct) =>
         Ok(await _users.UpdateUserAsync(ActorUsername, id, request, ct));
+
+    [HttpPost]
+    [HasPermission(RbacPermissions.UsersCreate)]
+    public async Task<IActionResult> Create([FromBody] CreateUserRequest request, CancellationToken ct)
+    {
+        var user = await _users.CreateUserAsync(ActorUsername, request, ct);
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+    }
+
+    [HttpPut("{id:int}/password")]
+    [HasPermission(RbacPermissions.UsersResetPassword)]
+    public async Task<IActionResult> ResetPassword(int id, [FromBody] ResetPasswordRequest request, CancellationToken ct)
+    {
+        await _users.ResetPasswordAsync(ActorUsername, id, request.NewPassword, ct);
+        return NoContent();
+    }
     
 }

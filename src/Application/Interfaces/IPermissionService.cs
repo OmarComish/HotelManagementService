@@ -3,7 +3,7 @@ public record UserAccess(
     string Username,
     string? RoleKey,
     IReadOnlyCollection<string> Permissions,
-    bool isSuperAdmin = false,
+    bool IsSuperAdmin = false,
     string? FullName = null);
 public interface IPermissionService
 {

@@ -109,6 +109,7 @@ builder.Services.AddScoped<IUserManagementService, UserManagementService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IRequestContext, HttpRequestContext>();
 builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddHttpClient<IIdentityAdminClient, IdentityAdminClient>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

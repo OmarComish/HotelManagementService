@@ -9,4 +9,5 @@ public interface IUsersRepository: IRepository<User>
     Task<User?> GetByIdForUpdateAsync(int id, CancellationToken ct = default);
     Task<int> CountActiveSuperAdminsAsync(CancellationToken ct = default);
     Task<bool> EmailExistsAsync(string email, int excludeUserId, CancellationToken ct = default);
+    Task<bool> DepartmentExistsAsync(int departmentId, CancellationToken ct = default);
 }

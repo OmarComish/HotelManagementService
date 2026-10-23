@@ -548,6 +548,10 @@ public class DbInitializer
         }
         */
         SeedRbac(context);
+
+        context.Database.ExecuteSqlRaw(
+            "SELECT setval(pg_get_serial_sequence('\"Users\"', 'Id'), COALESCE((SELECT MAX(\"Id\") FROM \"Users\"), 0) + 1, false);" +
+            "SELECT setval(pg_get_serial_sequence('\"Employees\"', 'Id'), COALESCE((SELECT MAX(\"Id\") FROM \"Employees\"), 0) + 1, false);");
     }
     private static void SeedRbac(HotelDbContext context)
     {

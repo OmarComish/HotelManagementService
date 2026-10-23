@@ -71,4 +71,7 @@ public class UserRepository: GenericRepository<User>, IUsersRepository
         var lower = email.ToLowerInvariant();
         return _dbSet.AnyAsync(u => u.Id != excludeUserId && u.Email.ToLower() == lower, ct);
     }
+
+    public Task<bool> DepartmentExistsAsync(int departmentId, CancellationToken ct = default) =>
+    _context.Set<Department>().AnyAsync(d => d.Id == departmentId, ct);
 }

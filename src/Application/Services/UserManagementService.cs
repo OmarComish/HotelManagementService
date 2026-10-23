@@ -4,6 +4,7 @@ using HotelManagementService.Application.Interfaces;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace HotelManagementService.Application.Services;
 
@@ -15,13 +16,15 @@ public class UserManagementService : IUserManagementService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPermissionService _permissionService;
     private readonly IAuditService _audit;
+    IIdentityAdminClient _identity;
 
     public UserManagementService(IUnitOfWork unitOfWork, IPermissionService permissionService,
-    IAuditService audit)
+    IAuditService audit, IIdentityAdminClient identity)
     {
         _unitOfWork = unitOfWork;
         _permissionService = permissionService;
         _audit = audit;
+        _identity = identity;
     }
 
     /* ---------- reads ---------- */
@@ -127,7 +130,7 @@ public class UserManagementService : IUserManagementService
 
         var userIsSuper = user.AssignedRole?.IsSuperAdmin == true;
 
-        if ((role.IsSuperAdmin || userIsSuper) && !actor.isSuperAdmin)
+        if ((role.IsSuperAdmin || userIsSuper) && !actor.IsSuperAdmin)
             throw new RbacException(403, "Only an administrator can grant or revoke administrator access.");
 
         if (userIsSuper && !role.IsSuperAdmin &&
@@ -208,7 +211,11 @@ public class UserManagementService : IUserManagementService
         if (user.AssignedRole?.IsSuperAdmin == true &&
             await _unitOfWork.Users.CountActiveSuperAdminsAsync(ct) <= 1)
             throw new RbacException(409, "The last active administrator cannot be deleted.");
-         
+
+        var removed = await _identity.DeleteAccountAsync(user.Username, ct);
+        if(!removed.Succeeded)
+           throw new RbacException(502, $"The login account could not be removed: {removed.Error}");
+
         await _audit.RecordAsync(new AuditEntry(
             actor.Username, actor.FullName ?? actor.Username,
             "user.deleted", "user", user.Id.ToString(), $"{user.FirstName} {user.LastName}",
@@ -246,6 +253,7 @@ public class UserManagementService : IUserManagementService
         _ => s.ToString().ToLowerInvariant()
     };
 
+
     private static ManagedUserDto ToDto(User u) => new(
         u.Id,
         u.FirstName,
@@ -258,4 +266,124 @@ public class UserManagementService : IUserManagementService
         StatusToString(u.Status),
         u.CreatedAt,
         u.UpdatedAt);
+
+
+    public async Task<ManagedUserDto> CreateUserAsync(
+        string actorUsername, CreateUserRequest request, CancellationToken ct = default)
+    {
+        var actor = await GetActorAsync(actorUsername, ct);
+
+        var firstName = ValidateName(request.FirstName, "First name");
+        var lastName = ValidateName(request.LastName, "Last name");
+        var username = ValidateUsername(request.Username);
+        var email = ValidateEmail(request.Email);
+        if (string.IsNullOrEmpty(request.Password))
+            throw new RbacException(422, "Password is required");
+
+        var roleKey = (request.RoleKey ?? string.Empty).Trim().ToLowerInvariant();
+        var role = await _unitOfWork.Roles.FirstOrDefaultAsync(r => r.Key == roleKey);
+        if (role is null || !role.IsActive)
+            throw new RbacException(422, "Select a valid, active role");
+        if (role.IsSuperAdmin && !actor.IsSuperAdmin)
+            throw new RbacException(403, "You cannot assign the administrator role.");
+
+        if (!await _unitOfWork.Users.DepartmentExistsAsync(request.DepartmentId, ct))
+            throw new RbacException(422, "Select a valid department");
+        if (await _unitOfWork.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username) is not null)
+            throw new RbacException(409, "That username is already taken");
+        if (await _unitOfWork.Users.EmailExistsAsync(email, 0, ct))
+            throw new RbacException(409, "That email is already registered");
+
+        User user;
+        await _unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var employee = new Employee
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                DepartmentId = request.DepartmentId,
+                CreatedBy = actor.Username
+            };
+            await _unitOfWork.Employees.AddAsync(employee);
+
+            user = new User
+            {
+                Username = username,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PasswordHash = "managed-by-identity-service",   // credentials live in IdentityService
+                Status = RecordStatus.Active,
+                Employee = employee,
+                Role = role.IsSuperAdmin ? "Admin" : "Staff",    // legacy column, kept in sync
+                RoleId = role.Id,
+                CreatedBy = actor.Username
+            };
+            await _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync();                // ids are generated here
+
+            await _audit.RecordAsync(new AuditEntry(
+                actor.Username, actor.FullName ?? actor.Username,
+                "user.created", "user", user.Id.ToString(), $"{firstName} {lastName}",
+                Previous: null,
+                New: new { username, email, role = role.Key, status = "active" }));
+            await _unitOfWork.SaveChangesAsync();
+
+            var account = await _identity.CreateAccountAsync(username, email, request.Password, ct);
+            if (!account.Succeeded)
+                throw new RbacException(422, account.Error ?? "The login account could not be created.");
+
+            try
+            {
+                await _unitOfWork.CommitTransactionAsync();
+            }
+            catch
+            {
+                await _identity.DeleteAccountAsync(username, ct);   // don't leave an orphan login
+                throw;
+            }
+        }
+        catch
+        {
+            await _unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
+
+        return (await GetUserAsync(user.Id, ct))!;
+    }
+
+    public async Task ResetPasswordAsync(
+    string actorUsername, int id, string newPassword, CancellationToken ct = default)
+    {
+        var actor = await GetActorAsync(actorUsername, ct);
+
+        var user = await _unitOfWork.Users.GetByIdForUpdateAsync(id, ct)
+            ?? throw new RbacException(404, "User not found");
+
+        if (string.IsNullOrEmpty(newPassword))
+            throw new RbacException(422, "Password is required");
+
+        var result = await _identity.ResetPasswordAsync(user.Username, newPassword, ct);
+        if (!result.Succeeded)
+            throw new RbacException(422, $"Password requirements: {result.Error}");
+
+        user.UpdatedAt = DateTime.UtcNow;
+        user.UpdatedBy = actor.Username;
+
+        await _audit.RecordAsync(new AuditEntry(
+            actor.Username, actor.FullName ?? actor.Username,
+            "user.password_reset", "user", user.Id.ToString(), $"{user.FirstName} {user.LastName}",
+            Previous: null,
+            New: new { passwordReset = true }));
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    private static string ValidateUsername(string? raw)
+    {
+        var value = (raw ?? string.Empty).Trim().ToLowerInvariant();
+        if (!Regex.IsMatch(value, "^[a-z0-9._-]{3,30}$"))
+            throw new RbacException(422, "Username must be 3-30 characters (letters, numbers, dot, dash, underscore)");
+        return value;
+    }
 }
