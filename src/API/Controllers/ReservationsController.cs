@@ -24,7 +24,6 @@ public class ReservationsController: ControllerBase
         Console.WriteLine($"{createReservationDto}");
         if (createReservationDto != null)
         {
-            
             response = await _reservationService.CreateReservation(createReservationDto);
         }
         return Ok(response);

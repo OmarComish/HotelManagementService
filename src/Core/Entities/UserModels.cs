@@ -5,3 +5,4 @@ public record CreateUserRequest(
     string Password, string RoleKey, int DepartmentId);
 
 public record ResetPasswordRequest(string NewPassword);
+public record DepartmentDto(int Id, string Name);

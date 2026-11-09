@@ -139,12 +139,20 @@ public class GuestService :  IGuestService
     }
     public async Task<ReservationDto> GetCurrentReservationByGuestIdAsync(string roomNumber)
     {
-        var reservation = await _unitOfWork.Reservations.GetCurrentReservationByRoomNumberAsync(roomNumber);
+         var reservation = await _unitOfWork.Reservations.GetCurrentReservationByRoomNumberAsync(roomNumber);
 
-          Console.WriteLine($"SERVICE - Reservation GuestId: {reservation.GuestId}");
-          var guest = _mapper.Map<ReservationDto>(reservation);
-          guest.GuestId = reservation.GuestId; //Automapping is skipping GuestId,- work aroud is to assign it manually to the guest object
-          return guest;
+            if (reservation == null)
+            {
+                throw new KeyNotFoundException(
+                    $"No current reservation found for room number {roomNumber}.");
+            }
+
+            Console.WriteLine($"SERVICE - Reservation GuestId: {reservation.GuestId}");
+
+            var guest = _mapper.Map<ReservationDto>(reservation);
+            guest.GuestId = reservation.GuestId;
+
+            return guest;
     }
     public async Task<IEnumerable<CheckOutGuestDto>> GetCheckOutGuests()
     {

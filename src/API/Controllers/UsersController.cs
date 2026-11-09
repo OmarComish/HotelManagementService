@@ -78,4 +78,8 @@ public class UsersController : ControllerBase
         return NoContent();
     }
     
+    [HttpGet("departments")]
+    [Authorize]
+    public async Task<IActionResult> GetDepartments(CancellationToken ct) =>
+        Ok(await _users.GetDepartmentsAsync(ct));
 }

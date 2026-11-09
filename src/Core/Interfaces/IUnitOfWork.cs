@@ -28,6 +28,7 @@ public interface IUnitOfWork : IDisposable
     IOrderTypesRepository OrderTypes {get;}
     IRoleRepository Roles {get;}
     IAuditLogRepository AuditLogs {get;}
+    IRepository<AppSetting> AppSettings { get; }
     
     //Task<int> SaveChangesAsync();
     Task<int> SaveChangesAsync();

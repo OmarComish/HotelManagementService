@@ -12,4 +12,5 @@ public interface IUserManagementService
     Task<ManagedUserDto> UpdateUserAsync(string actorUsername, int id, UpdateUserRequest request, CancellationToken ct = default);
     Task<ManagedUserDto> CreateUserAsync(string actorUsername, CreateUserRequest request, CancellationToken ct = default);
     Task ResetPasswordAsync(string actorUsername, int id, string newPassword, CancellationToken ct = default);
+    Task<IReadOnlyList<DTOs.DepartmentDto>> GetDepartmentsAsync(CancellationToken ct = default);  
 }

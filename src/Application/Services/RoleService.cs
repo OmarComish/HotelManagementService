@@ -42,6 +42,14 @@ public class RoleService : IRoleService
             .ToList();
     }
 
+    public async Task<IReadOnlyList<RoleLookupDto>> GetRoleLookupAsync(CancellationToken ct = default)
+    {
+        var roles = await _unitOfWork.Roles.GetAllAsync();
+        return roles.OrderBy(r => r.Name)
+            .Select(r => new RoleLookupDto(r.Id, r.Key, r.Name, r.IsActive ? "active" : "inactive"))
+            .ToList();
+    }
+
      /* ---------- mutations ---------- */
 
     

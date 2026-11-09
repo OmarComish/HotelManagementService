@@ -17,14 +17,16 @@ public class UserManagementService : IUserManagementService
     private readonly IPermissionService _permissionService;
     private readonly IAuditService _audit;
     IIdentityAdminClient _identity;
+    private readonly ISettingsService _settings;
 
     public UserManagementService(IUnitOfWork unitOfWork, IPermissionService permissionService,
-    IAuditService audit, IIdentityAdminClient identity)
+    IAuditService audit, IIdentityAdminClient identity, ISettingsService settings)
     {
         _unitOfWork = unitOfWork;
         _permissionService = permissionService;
         _audit = audit;
         _identity = identity;
+        _settings = settings;
     }
 
     /* ---------- reads ---------- */
@@ -54,13 +56,11 @@ public class UserManagementService : IUserManagementService
         var (items, total) = await _unitOfWork.Users.SearchAsync(criteria, ct);
         return new PagedResult<ManagedUserDto>(items.Select(ToDto).ToList(), total, page, pageSize);
     }
-
     public async Task<ManagedUserDto?> GetUserAsync(int id, CancellationToken ct = default)
     {
         var user = await _unitOfWork.Users.GetByIdWithRoleAsync(id, ct);
         return user is null ? null : ToDto(user);
     }
-
     public async Task<ManagedUserDto> UpdateUserAsync(
         string actorUsername, int id, UpdateUserRequest request, CancellationToken ct = default)
     {
@@ -267,7 +267,6 @@ public class UserManagementService : IUserManagementService
         u.CreatedAt,
         u.UpdatedAt);
 
-
     public async Task<ManagedUserDto> CreateUserAsync(
         string actorUsername, CreateUserRequest request, CancellationToken ct = default)
     {
@@ -279,6 +278,13 @@ public class UserManagementService : IUserManagementService
         var email = ValidateEmail(request.Email);
         if (string.IsNullOrEmpty(request.Password))
             throw new RbacException(422, "Password is required");
+
+        var passwordErrors = PasswordPolicy.Validate(
+            request.Password,                       // use newPassword in ResetPasswordAsync
+            await _settings.GetSecurityAsync(ct));
+
+        if (passwordErrors.Count > 0)
+            throw new RbacException(422, $"Password requirements: {string.Join(", ", passwordErrors)}");
 
         var roleKey = (request.RoleKey ?? string.Empty).Trim().ToLowerInvariant();
         var role = await _unitOfWork.Roles.FirstOrDefaultAsync(r => r.Key == roleKey);
@@ -364,6 +370,11 @@ public class UserManagementService : IUserManagementService
         if (string.IsNullOrEmpty(newPassword))
             throw new RbacException(422, "Password is required");
 
+        var passwordErrors = PasswordPolicy.Validate(newPassword,await _settings.GetSecurityAsync(ct));
+        
+        if (passwordErrors.Count > 0)
+            throw new RbacException(422, $"Password requirements: {string.Join(", ", passwordErrors)}");
+
         var result = await _identity.ResetPasswordAsync(user.Username, newPassword, ct);
         if (!result.Succeeded)
             throw new RbacException(422, $"Password requirements: {result.Error}");
@@ -385,5 +396,11 @@ public class UserManagementService : IUserManagementService
         if (!Regex.IsMatch(value, "^[a-z0-9._-]{3,30}$"))
             throw new RbacException(422, "Username must be 3-30 characters (letters, numbers, dot, dash, underscore)");
         return value;
+    }
+
+    public async Task<IReadOnlyList<DTOs.DepartmentDto>> GetDepartmentsAsync(CancellationToken ct = default)
+    {
+        var departments = await _unitOfWork.Users.GetDepartmentsAsync(ct);
+        return departments.Select(d => new DTOs.DepartmentDto(d.Id, d.Name)).ToList();
     }
 }

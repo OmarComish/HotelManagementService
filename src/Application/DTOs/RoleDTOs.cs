@@ -16,3 +16,6 @@ public record RoleInput(
     string? Description,
     string Status,                        // "active" | "inactive"
     IReadOnlyList<string>? Permissions);  // permission keys, e.g. "Users.View"
+
+
+public record RoleLookupDto(int Id, string Key, string Name, string Status);

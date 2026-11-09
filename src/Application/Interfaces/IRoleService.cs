@@ -9,4 +9,5 @@ public interface IRoleService
     Task<RoleDto> CreateRoleAsync(string actorUsername, RoleInput input, CancellationToken ct = default);
     Task<RoleDto> UpdateRoleAsync(string actorUsername, int id, RoleInput input, CancellationToken ct = default);
     Task DeleteRoleAsync(string actorname, int id, CancellationToken ct = default);
+    Task<IReadOnlyList<RoleLookupDto>> GetRoleLookupAsync(CancellationToken ct = default);
 }

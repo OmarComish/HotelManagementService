@@ -23,14 +23,14 @@ public class PermissionService: IPermissionService
         // Mirrors authorize() in rbac.ts: inactive users and inactive roles grant nothing.
         if(user.Status != RecordStatus.Active || role is null || !role.IsActive)
         {
-            return new UserAccess(user.Username,null, Array.Empty<string>(), false, fullName);
+            return new UserAccess(user.Username,null, Array.Empty<string>(), false, fullName, user.Id, user.Email);
         }
 
         var  permissions = role.RolePermissions
           .Select(rp => rp.Permission.Key)
           .ToList();
 
-        return new UserAccess(user.Username, role.Key, permissions, role.IsSuperAdmin, fullName);
+        return new UserAccess(user.Username, role.Key, permissions, role.IsSuperAdmin, fullName, user.Id, user.Email);
 
     }
 }

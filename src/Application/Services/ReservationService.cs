@@ -70,6 +70,7 @@ public class ReservationService : IReservationService
                 var reservation = _mapper.Map<Reservation>(createReservationDto);
              
                 reservation.Status = createReservationDto.Status;
+                reservation.CreatedAt = DateTime.UtcNow;
 
                //Assign the Foreign Key Guest ID to link Guest with their Reservation
              

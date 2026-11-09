@@ -4,7 +4,9 @@ public record UserAccess(
     string? RoleKey,
     IReadOnlyCollection<string> Permissions,
     bool IsSuperAdmin = false,
-    string? FullName = null);
+    string? FullName = null,
+    int UserId = 0,
+    string? Email = null);
 public interface IPermissionService
 {
     /// Returns null if the user does not exist. Returns an empty permission set

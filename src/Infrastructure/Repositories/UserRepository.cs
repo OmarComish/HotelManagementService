@@ -74,4 +74,7 @@ public class UserRepository: GenericRepository<User>, IUsersRepository
 
     public Task<bool> DepartmentExistsAsync(int departmentId, CancellationToken ct = default) =>
     _context.Set<Department>().AnyAsync(d => d.Id == departmentId, ct);
+
+    public Task<List<Department>> GetDepartmentsAsync(CancellationToken ct = default) =>
+    _context.Set<Department>().AsNoTracking().OrderBy(d => d.Name).ToListAsync(ct);
 }

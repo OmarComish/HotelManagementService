@@ -110,6 +110,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IRequestContext, HttpRequestContext>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddHttpClient<IIdentityAdminClient, IdentityAdminClient>();
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

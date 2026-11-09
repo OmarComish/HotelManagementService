@@ -34,6 +34,7 @@ public class UnitOfWork : IUnitOfWork
     public IOrderTypesRepository OrderTypes {get;}
     public IRoleRepository Roles {get;}
     public IAuditLogRepository AuditLogs {get;}
+    public IRepository<AppSetting> AppSettings { get; }
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -60,6 +61,7 @@ public class UnitOfWork : IUnitOfWork
         OrderTypes = new OrderTypeRepository(_context);
         Roles = new RoleRepository(_context);
         AuditLogs = new AuditLogRepository(_context);
+        AppSettings = new GenericRepository<AppSetting>(_context);
 
     }
 

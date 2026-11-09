@@ -54,9 +54,12 @@ public class AuthController: ControllerBase
 
         return Ok(new
         {
-           username = access.Username,
-           role = access.RoleKey,
-           permission = access.Permissions 
+            id = access.UserId,
+            username = access.Username,
+            name = access.FullName ?? access.Username,
+            email = access.Email,
+            role = access.RoleKey,
+            permissions = access.Permissions 
         });
     }
 }

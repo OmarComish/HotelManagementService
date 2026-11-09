@@ -4,6 +4,7 @@ using HotelManagementService.Application.DTOs;
 using HotelManagementService.Application.Exceptions;
 using HotelManagementService.Application.Interfaces;
 using HotelManagementService.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelmanagementService.API.Controllers;
@@ -63,4 +64,8 @@ public class RolesController : ControllerBase
         await _roleService.DeleteRoleAsync(ActorUsername,id, ct);
         return NoContent();
     }
+    [HttpGet("lookup")]
+    [Authorize]
+    public async Task<IActionResult> Lookup(CancellationToken ct) =>
+        Ok(await _roleService.GetRoleLookupAsync(ct));
 }
