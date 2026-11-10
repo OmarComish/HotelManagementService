@@ -120,7 +120,17 @@ public class ReservationService : IReservationService
     public async Task<List<ReservationDto>> GetAllReservations()
     {
         var reservations = await _unitOfWork.Reservations.GetWithRoomDetailsAsync();   
-        return _mapper.Map<List<ReservationDto>>(reservations);
+        var mappedReservations = _mapper.Map<List<ReservationDto>>(reservations);
+        
+        foreach (var reservation in mappedReservations)
+        {
+            Console.WriteLine(
+                $"DTO Reservation: {reservation.Id}, " +
+                $"Email: {reservation.Email}, " +
+                $"Phone: {reservation.Phone}"
+            );
+        }
+        return mappedReservations;
     }
     public async Task<ReservationDto> UpdateReservationAsync(UpdateReservationDto reservationdto)
     {

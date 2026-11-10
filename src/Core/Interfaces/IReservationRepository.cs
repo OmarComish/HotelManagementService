@@ -9,4 +9,5 @@ public interface IReservationRepository: IRepository<Reservation>
    Task<Reservation> GetCurrentReservationByRoomNumberAsync(string roomNumber);
    Task<Reservation?> GetActiveReservationByGuestAsync(int guestId);
    Task<IEnumerable<Reservation>> GetAllReservationsPendingCheckOutAsync();
+   Task<Reservation?> GetWithGuestAndRoomByIdAsync(int id);
 }

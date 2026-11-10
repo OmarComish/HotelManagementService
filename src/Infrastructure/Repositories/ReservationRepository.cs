@@ -66,12 +66,19 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
                 r.GuestId == guestId &&
                 r.Status == ReservationStatuses.CheckedIn);
     }
+
+    public async Task<Reservation?> GetWithGuestAndRoomByIdAsync(int id)
+    {
+        return await ReservationWithDetails
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == id);
+    }
     private async Task<IEnumerable<Reservation>> GetAllReservations()
     {
         var response = await _context.Reservations
             .Include(r =>r.Guest)
             .Include(r =>r.Room).ToListAsync();
-
+            
         return response;   
     }
     

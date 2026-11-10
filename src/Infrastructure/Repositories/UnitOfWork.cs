@@ -35,6 +35,7 @@ public class UnitOfWork : IUnitOfWork
     public IRoleRepository Roles {get;}
     public IAuditLogRepository AuditLogs {get;}
     public IRepository<AppSetting> AppSettings { get; }
+    public IRepository<Notification> Notifications { get; }
     public UnitOfWork(HotelDbContext context)
     {
         _context = context;
@@ -62,7 +63,7 @@ public class UnitOfWork : IUnitOfWork
         Roles = new RoleRepository(_context);
         AuditLogs = new AuditLogRepository(_context);
         AppSettings = new GenericRepository<AppSetting>(_context);
-
+        Notifications = new GenericRepository<Notification>(_context);
     }
 
     public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();

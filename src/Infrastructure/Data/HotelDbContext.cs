@@ -35,7 +35,7 @@ public class HotelDbContext : DbContext
     public DbSet<RolePermission> RolePermissions { get; set; }
     public DbSet<AppSetting> AppSettings { get; set; }
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-
+    public DbSet<Notification> Notifications { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Hotel>(entity =>
