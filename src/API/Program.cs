@@ -15,6 +15,8 @@ using HotelmanagementService.API.Authorization;
 using HotelmanagementService.API.Services;
 using HotelManagementService.Application.Services.Notifications;
 using HotelManagementService.Application.Interfaces.Notifications;
+using Microsoft.Extensions.Options;
+using HotelManagementService.Infrastructure.Notifications;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +47,7 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -115,6 +117,7 @@ builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddHttpClient<IIdentityAdminClient, IdentityAdminClient>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
