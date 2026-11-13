@@ -2,6 +2,7 @@ using System.Reflection.Metadata;
 using AutoMapper;
 using HotelManagementService.Application.DTOs;
 using HotelManagementService.Application.Interfaces;
+using HotelManagementService.Application.Interfaces.Notifications;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
 
@@ -12,11 +13,13 @@ public class ReservationService : IReservationService
      private readonly IMapper _mapper;
      //private readonly ILogger<ReservationService> _logger;
      private readonly IUnitOfWork _unitOfWork;
+     private readonly INotificationService _notificationService;
 
-    public ReservationService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ReservationService(IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _notificationService = notificationService;
     }
 
     public async Task<ResponseDto> CreateReservation(CreateReservationDto createReservationDto)
@@ -96,6 +99,15 @@ public class ReservationService : IReservationService
                 var roomstatuschange = await _unitOfWork.Rooms.UpdateAsync(room);
 
                 await _unitOfWork.SaveChangesAsync();
+                try
+                {
+                     await _notificationService.SendReservationConfirmationAsync(createdreservation.Id);
+                }
+                catch(Exception notificationException)
+                {
+                        Console.WriteLine(
+                         $"Reservation {createdreservation.Id} was saved, but notification processing failed: {notificationException.Message}");
+                }
 
                 response.Status ="success";
                 response.Message = "Reservation created successfully";

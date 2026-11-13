@@ -58,16 +58,28 @@ public class NotificationService : INotificationService
             (token) => _emailSender.SendEmailAsync(
                 reservation.Email, "Reservation Confirmation", message, token),
             cancellationToken);
-
-        await SendAndRecordAsync(
+            
+        if( _whatsAppSender.isEnabled)
+        {
+             await SendAndRecordAsync(
             reservationId,
             reservation.Phone,
             "WhatsApp",
             string.Empty,
             message,
             (token) => _whatsAppSender.SendMessageAsync(
-                reservation.Phone, message, token),
+                reservation.Phone, new[]
+                {
+                    guestName,
+                    reservation.Room.RoomNumber,
+                    reservation.CheckIn.ToString("dd MMM yyyy"),
+                    reservation.CheckOut.ToString("dd MMM yyyy"),
+                    reservation.Guests.ToString(),
+                    reservation.TotalAmount.ToString("N2")
+                }, token),
             cancellationToken);
+        }
+       
     }
 
     private async Task SendAndRecordAsync(int reservationId,string recipient,string channel,string subject,

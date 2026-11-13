@@ -48,6 +48,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<WhatsAppSettings>(builder.Configuration.GetSection("WhatsAppSettings"));
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
@@ -118,6 +119,7 @@ builder.Services.AddHttpClient<IIdentityAdminClient, IdentityAdminClient>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddHttpClient<IWhatsAppSender, WhatsAppSender>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

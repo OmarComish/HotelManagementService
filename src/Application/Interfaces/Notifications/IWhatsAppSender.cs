@@ -2,9 +2,10 @@ namespace HotelManagementService.Application.Interfaces.Notifications
 {
     public interface IWhatsAppSender
     {
+        bool isEnabled { get; }
         Task SendMessageAsync(
-            string recipient,
-            string message,
-            CancellationToken cancellationToken = default);
+                string recipient,
+                IReadOnlyList<string> parameters,
+                CancellationToken cancellationToken = default);
     }
 }
