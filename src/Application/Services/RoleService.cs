@@ -112,7 +112,6 @@ public class RoleService : IRoleService
 
         return (await GetRoleAsync(role.Id, ct))!;
     }
-
     public async Task<RoleDto> UpdateRoleAsync(string actorUsername, int id, RoleInput input, CancellationToken ct = default)
     {
         var actor = await GetActorAsync(actorUsername, ct);
@@ -183,7 +182,6 @@ public class RoleService : IRoleService
 
         return (await GetRoleAsync(role.Id, ct))!;
     }
-
     public async Task DeleteRoleAsync(string actorUsername, int id, CancellationToken ct = default)
     {
         var actor = await GetActorAsync(actorUsername, ct);

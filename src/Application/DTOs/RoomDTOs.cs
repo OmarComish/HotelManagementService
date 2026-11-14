@@ -22,7 +22,8 @@ public class RoomDto
      public int Id {get; set;}
      public int HotelId {get; set;}
      public string RoomNumber {get; set;}
-     public string Type {get; set;} 
+     public string Type {get; set;}
+     public int RoomTypeId {get; set;} 
      public decimal Price {get; set;}
      public string Status {get; set;}
      public IEnumerable<AmenitiesDto> Amenitieslist {get; set;} = new List<AmenitiesDto>();

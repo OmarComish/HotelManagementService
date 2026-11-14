@@ -2,6 +2,7 @@ using AutoMapper;
 using HotelManagementService.Application.DTOs;
 using HotelManagementService.Core.Entities;
 using HotelManagementService.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 
 
@@ -34,16 +35,16 @@ public class RoomService : IRoomService
             throw new InvalidOperationException("Room number already exists in this hotel");
 
         var room = _mapper.Map<Room>(createRoomDto);
-        
+
           // Set default status
-        room.Status = RecordStatus.Available; 
+        room.Status = RecordStatus.Available;
+        room.CreatedAt = DateTime.UtcNow;
+        room.CreatedBy = "System"; // You can replace this with the actual user if available 
 
         var createdRoom = await _unitOfWork.Rooms.AddAsync(room);
         await _unitOfWork.SaveChangesAsync();
 
-        Console.WriteLine($"Room ID:::::::::: {room.Id}");
-        Console.WriteLine($"Room Number:::::::::: {room.RoomNumber}");
-        Console.WriteLine($"Room Type:::::::::: {room.RoomType}");
+      
 
         //_logger.LogInformation("Room created successfully with ID: {RoomId}", createdRoom.Id);
 
@@ -89,10 +90,41 @@ public class RoomService : IRoomService
             "Check-out date must be later than check-in date.");
         }
 
-        var rooms = await _unitOfWork.Rooms.FindAsync(
+        /*var rooms = await _unitOfWork.Rooms.FindAsync(
             r => r.HotelId == hotelId
                 && r.RoomTypeId == roomTypeId
-                && r.Status == RecordStatus.Available);
+                && r.Status == RecordStatus.Available);*/
+
+        var rooms = await _unitOfWork.Rooms
+            .GetQueryable(query => query
+                .Include(r => r.RoomType)
+                    .ThenInclude(rt => rt.Amenities)
+                      .ThenInclude(ra =>ra.Amenities)
+                .Include(r => r.Hotel))
+            .Where(r => r.HotelId == hotelId
+                && r.RoomTypeId == roomTypeId
+                && r.Status == RecordStatus.Available)
+            .ToListAsync();
+
+
+        foreach (var room in rooms)
+        {
+            Console.WriteLine(
+                $"Room: {room.RoomNumber}, " +
+                $"RoomType: {room.RoomType?.Type}, " +
+                $"RoomAmenities Count: {room.RoomType?.Amenities?.Count}");
+
+            if (room.RoomType?.Amenities != null)
+            {
+                foreach (var ra in room.RoomType.Amenities)
+                {
+                    Console.WriteLine(
+                        $"RoomAmenities ID: {ra.Id}, " +
+                        $"AmenitiesId: {ra.AmenitiesId}, " +
+                        $"Amenities Name: {ra.Amenities?.Name ?? "NULL"}");
+                }
+            }
+        }
 
         if (rooms == null || !rooms.Any())
         {
@@ -115,9 +147,9 @@ public class RoomService : IRoomService
         }
 
         var roomsFound = _mapper.Map<List<RoomDto>>(availableRooms);
-        var rs = await PopulateRoomPriceAsync(roomsFound);
-
-        return rs;
+        PopulateAmenities(availableRooms, roomsFound);
+       
+        return roomsFound;
     }
     public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(int hotelId, DateTime checkIn, DateTime checkOut)
     {
@@ -193,14 +225,33 @@ public class RoomService : IRoomService
     {
         for(int r = 0; r < dto.Count; r ++)
         {
-            
-            var roomType = await _unitOfWork.RoomTypes.FirstOrDefaultAsync(m =>m.Id == dto[r].Id);
+            Console.WriteLine($"::::::Getting price for room number: {dto[r].RoomNumber}, RoomTypeId: {dto[r].Id}");
+            var roomType = await _unitOfWork.RoomTypes.FirstOrDefaultAsync(m =>m.Id == dto[r].RoomTypeId);
             
             if(roomType!= null)
             {
+                Console.WriteLine($":::::Found room type: {dto[r].RoomNumber}, Price: {roomType.Price}");
                 dto[r].Price = roomType.Price;
             }
         }
         return dto;
+    }
+    private void PopulateAmenities(IEnumerable<Room> rooms,List<RoomDto> roomDtos)
+    {
+        foreach (var room in rooms)
+        {
+            var dto = roomDtos.FirstOrDefault(x => x.Id == room.Id);
+
+            if (dto == null) continue;
+
+            dto.Amenitieslist = room.RoomType.Amenities
+                .Where(ra => ra.Amenities != null)
+                .Select(ra => new AmenitiesDto
+                {
+                    Id = ra.Amenities.Id,
+                    Name = ra.Amenities.Name
+                })
+                .ToList();
+        }
     }
 }

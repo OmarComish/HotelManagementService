@@ -109,6 +109,7 @@ public class RoomsController : ControllerBase
         [FromQuery] DateTime checkIn,
         [FromQuery] DateTime checkOut)
     {
+        Console.WriteLine($"Checking passed values::::RoomTypeId::{roomTypeId}");
         if (checkIn >= checkOut)
             return BadRequest("Check-in date must be before check-out date");
 

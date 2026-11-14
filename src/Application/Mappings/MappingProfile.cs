@@ -30,12 +30,44 @@ public class MappingProfile : Profile
         //Room mappings
         CreateMap<CreateRoomDto, Room>();
         CreateMap<Room, RoomDto>()
+            .ForMember(dest => dest.Id,
+                opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.HotelId,
+                opt => opt.MapFrom(src => src.HotelId))
+            .ForMember(dest => dest.RoomTypeId,
+                opt => opt.MapFrom(src => src.RoomTypeId))
+            .ForMember(dest => dest.RoomNumber,
+                opt => opt.MapFrom(src => src.RoomNumber))
+            .ForMember(dest => dest.Type,
+                opt => opt.MapFrom(src => src.RoomType != null
+                    ? src.RoomType.Type
+                    : string.Empty))
+            .ForMember(dest => dest.Price,
+                opt => opt.MapFrom(src => src.RoomType != null
+                    ? src.RoomType.Price
+                    : 0))
+            .ForMember(dest => dest.HotelName,
+                opt => opt.MapFrom(src => src.Hotel != null
+                    ? src.Hotel.Name
+                    : null))
+            .ForMember(dest => dest.Amenitieslist,
+                opt => opt.MapFrom(src =>
+                    src.RoomType.Amenities
+                        .Where(ra => ra.Amenities != null)
+                        .Select(ra => new AmenitiesDto
+                        {
+                            Id = ra.Amenities.Id,
+                            Name = ra.Amenities.Name
+                        })));
+
+        /*CreateMap<Room, RoomDto>()
+            .ForMember(dest => dest.RoomTypeId, opt => opt.MapFrom(src => src.RoomTypeId))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.RoomType != null? src.RoomType.Type: string.Empty))
-            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.RoomType.Price))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.RoomType!= null? src.RoomType.Price: 0m))
             .ForMember(dest => dest.HotelName, opt => opt.MapFrom(src => src.Hotel != null ? src.Hotel.Name : null))
             .ForMember(dest =>dest.Amenitieslist, 
              opt=>opt.MapFrom(src=>src.RoomType!= null? 
-             src.RoomType.Amenities.Select(ra => ra.Amenities):Enumerable.Empty<Amenities>()));
+             src.RoomType.Amenities.Select(ra => ra.Amenities):Enumerable.Empty<Amenities>()));*/
 
         //Invoice
         CreateMap<Invoice, CreateInvoiceDto>().ReverseMap();
