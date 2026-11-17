@@ -19,4 +19,10 @@ public static class RbacPermissions
     public const string SettingsEdit = "Settings.Edit";
 
     public const string AuditLogsView = "AuditLogs.View";
+
+    //Rooms
+    public const string RoomsView = "Rooms.View";
+    public const string RoomsCreate = "Rooms.Create";
+    public const string RoomsEdit = "Rooms.Edit";
+    public const string RoomsDelete = "Rooms.Delete";
 }

@@ -70,9 +70,23 @@ public class RoomService : IRoomService
 
     public async Task<IEnumerable<RoomDto>> GetRoomsByHotelIdAsync(int hotelId)
     {
-        var rooms = await _unitOfWork.Rooms.FindAsync(r => r.HotelId == hotelId);
-      
-        return _mapper.Map<IEnumerable<RoomDto>>(rooms);
+        var rooms = await _unitOfWork.Rooms
+            .GetQueryable(query => query
+                .Include(r => r.RoomType)
+                    .ThenInclude(rt => rt.Amenities)
+                      .ThenInclude(ra =>ra.Amenities)
+                .Include(r => r.Hotel))
+            .Where(r => r.HotelId == hotelId)
+            .ToListAsync();
+        var availableRooms = new List<Room>();
+
+        foreach(var room in rooms)
+        {
+             availableRooms.Add(room);
+        }
+        var roomsFound=  _mapper.Map<List<RoomDto>>(availableRooms);
+        PopulateAmenities(availableRooms,roomsFound);
+        return roomsFound;
     }
     
     public async Task<IEnumerable<RoomDto>> GetAvailableRoomsByTypeAsync(

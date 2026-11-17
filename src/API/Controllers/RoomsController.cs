@@ -1,10 +1,14 @@
+using HotelmanagementService.API.Authorization;
+using HotelmanagementService.API.Filters;
 using HotelManagementService.Application.DTOs;
+using HotelManagementService.Core.Constants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelManagementService.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[TypeFilter(typeof(RbacExceptionFilter))]
 [Produces("application/json")]
 public class RoomsController : ControllerBase
 {
@@ -72,11 +76,13 @@ public class RoomsController : ControllerBase
     /// </summary>
     /// <returns>List of rooms</returns>
     [HttpGet]
+    [HasPermission(RbacPermissions.RoomsView)]
     [ProducesResponseType(typeof(IEnumerable<RoomDto>), 200)]
     public async Task<ActionResult<IEnumerable<RoomDto>>> GetAllRooms()
     {
-        var rooms = await _roomService.GetAllRoomsAsync();
-        return Ok(rooms);
+       int hotelId = 1; // Replace with actual hotel ID if needed
+       var rooms = await _roomService.GetRoomsByHotelIdAsync(hotelId);   //GetAllRoomsAsync();
+       return Ok(rooms);
     }
 
     /// <summary>
@@ -109,7 +115,6 @@ public class RoomsController : ControllerBase
         [FromQuery] DateTime checkIn,
         [FromQuery] DateTime checkOut)
     {
-        Console.WriteLine($"Checking passed values::::RoomTypeId::{roomTypeId}");
         if (checkIn >= checkOut)
             return BadRequest("Check-in date must be before check-out date");
 
