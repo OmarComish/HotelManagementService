@@ -54,7 +54,7 @@ public class ReservationDto
     public DateTime CheckOut {get; set;}
     public string Status {get; set;}
     public string ReservationSource {get; set;}
-    public string SpecialRequests {get; set;}
+    public string? SpecialRequests {get; set;}
     public string Phone {get; set;}
     public decimal TotalAmount {get; set;}
     public string Email {get; set;}

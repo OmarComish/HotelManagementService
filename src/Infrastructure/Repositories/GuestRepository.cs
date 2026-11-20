@@ -24,4 +24,15 @@ public class GuestRepository: GenericRepository<Guest>, IGuestRepository
                      .Include(g => g.Bookings)
                      .ThenInclude(g => g.Room).ToListAsync();
     }
+
+    public async Task<IEnumerable<Guest>> GetReservationsHistoryAsync()
+    {
+         return await _context.Guests
+            .Include(g => g.GuestPreferences)
+                .ThenInclude(gp => gp.Preferences)
+            .Include(g => g.Reservations)
+                .ThenInclude(r => r.Invoices)
+
+        .ToListAsync();
+    }
 }

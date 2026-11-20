@@ -175,4 +175,16 @@ public class ReservationsController: ControllerBase
         var reservation = await _guestService.GetCurrentReservationByGuestIdAsync(roomNumber);
         return Ok(reservation);
     }
+    [HttpGet("todays-arrivals")]
+    public async Task<ActionResult<List<ReservationDto>>> GetTodaysReservations()
+    {
+        var reservations = await _reservationService.GetTodaysReservations();
+        return Ok(reservations);
+    }
+    [HttpGet("in-house-guests")]
+    public async Task<ActionResult<List<ReservationDto>>> GetInHouseGuestList()
+    {
+        var inhouseguestlist = await _reservationService.GetInHouseGuestListAsync();
+        return Ok(inhouseguestlist);
+    }
 }

@@ -38,8 +38,7 @@ public class MappingProfile : Profile
                 opt => opt.MapFrom(src => src.RoomTypeId))
             .ForMember(dest => dest.RoomNumber,
                 opt => opt.MapFrom(src => src.RoomNumber))
-            .ForMember(dest => dest.Type,
-                opt => opt.MapFrom(src => src.RoomType != null
+            .ForMember(dest => dest.Type,opt => opt.MapFrom(src => src.RoomType != null
                     ? src.RoomType.Type
                     : string.Empty))
             .ForMember(dest => dest.Price,
@@ -100,9 +99,11 @@ public class MappingProfile : Profile
 
         CreateMap<Guest, GuestDto>()
            .ForMember(dest => dest.Preferences, opt => opt.MapFrom(src => src.GuestPreferences
-           .Where(gp => gp.Preferences != null)
-           .Select(gp => gp.Preferences.Name)))
-           .ForMember(dest => dest.Bookings, opt => opt.MapFrom(src => src.Bookings));
+               .Where(gp => gp.Preferences != null)
+                .Select(gp => gp.Preferences.Name)))
+           .ForMember(dest => dest.Reservations, opt => opt.MapFrom(src => src.Reservations))
+           .ForMember(dest => dest.Invoices, opt => opt.MapFrom(src => src.Reservations
+                .SelectMany(r => r.Invoices)));
 
         //Task
         CreateMap<CreateTaskDto, TaskItem>();

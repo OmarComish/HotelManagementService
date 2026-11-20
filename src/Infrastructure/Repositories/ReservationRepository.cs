@@ -66,7 +66,16 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
                 r.GuestId == guestId &&
                 r.Status == ReservationStatuses.CheckedIn);
     }
-
+    public async Task<IEnumerable<Reservation>> GetGuestsArrivingAsync()
+    {
+        var today = DateTime.UtcNow.Date;
+            return await _context.Reservations
+                .Include(r => r.Room)
+                  .ThenInclude(r => r.RoomType)
+                .Include(r => r.Guest)
+                .Where(r => r.CheckIn == today)
+                .ToListAsync();
+    }
     public async Task<Reservation?> GetWithGuestAndRoomByIdAsync(int id)
     {
         return await ReservationWithDetails
@@ -81,5 +90,13 @@ public class ReservationRepository: GenericRepository<Reservation>, IReservation
             
         return response;   
     }
-    
+
+    public async Task<IEnumerable<Reservation>> GeInHouseGuestsAsync()
+    {
+        return await _context.Reservations
+            .Include(r => r.Room)
+            .Include(r => r.Guest)
+            .Where(r => r.Status == ReservationStatuses.CheckedIn)
+            .ToListAsync();
+    }
 }

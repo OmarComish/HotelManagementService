@@ -10,4 +10,6 @@ public interface IReservationService
     Task<ResponseDto> CheckIn(CheckInDto dto);
     Task<ResponseDto> CheckOut(int reservationId);
     Task<IEnumerable<ReservationDto>?> GetReservationOnCheckOutAsync();
+    Task<IEnumerable<ReservationDto>> GetTodaysReservations();
+    Task<IEnumerable<ReservationDto>> GetInHouseGuestListAsync();
 }

@@ -136,5 +136,11 @@ public class GuestsController : ControllerBase
         var response = await _guestService.GetCheckOutGuests();
         return Ok(response);
     }
+    [HttpGet("guest-reservations-history")]
+    public async Task<IActionResult> GetGuestReservationsHistory()
+    {
+        var response = await _guestService.GetGuestReservationsHistoryAsync();
+        return Ok(response);
+    }
 }
 

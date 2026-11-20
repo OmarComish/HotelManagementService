@@ -35,9 +35,11 @@ public record GuestDto {
     public string IDNumber { get; init; } = string.Empty;
     public string? Email { get; init; }
     public string? Notes { get; init; }
-    DateTime CreatedAt {get; set;}
+    public DateTime CreatedAt {get; set;}
     public IEnumerable<string> Preferences { get; init; } = new List<string>();
-    public IEnumerable<GuestBookingDto> Bookings { get; init; } = new List<GuestBookingDto>();
+    //public IEnumerable<GuestBookingDto> Bookings { get; init; } = new List<GuestBookingDto>();
+    public IEnumerable<ReservationDto> Reservations { get; init; } = new List<ReservationDto>();
+    public IEnumerable<InvoiceDto> Invoices { get; init; }= new List<InvoiceDto>();
 };
 public record GuestBookingDto
 {

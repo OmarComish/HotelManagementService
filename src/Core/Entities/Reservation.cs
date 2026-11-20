@@ -43,5 +43,5 @@ public class Reservation : BaseEntity
     public virtual Room Room { get; set; } = null!;
     public virtual Guest Guest { get; set; } = null!;
     //public virtual Payment? Payment { get; set; }
-    //public virtual Invoice? Invoice { get; set; }
+    public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 }

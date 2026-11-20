@@ -5,4 +5,5 @@ public interface IGuestRepository: IRepository<Guest>
 {
     Task<Guest> GuestWithPreferenceAsync(int id);
     Task<IEnumerable<Guest>> AllGuestsWithPreferenceAsync();
+    Task<IEnumerable<Guest>> GetReservationsHistoryAsync();
 }

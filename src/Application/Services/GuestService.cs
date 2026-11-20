@@ -160,4 +160,9 @@ public class GuestService :  IGuestService
         return _mapper.Map<IEnumerable<CheckOutGuestDto>>(response);
     }
 
+    public async Task<IEnumerable<GuestDto>> GetGuestReservationsHistoryAsync()
+    {
+         var guesthistory = await _unitOfWork.Guests.GetReservationsHistoryAsync();
+         return _mapper.Map<IEnumerable<GuestDto>>(guesthistory);
+    }
 }

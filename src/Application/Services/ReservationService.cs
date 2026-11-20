@@ -422,4 +422,18 @@ public class ReservationService : IReservationService
  
         return guestId;
     }
+
+    public async Task<IEnumerable<ReservationDto>> GetTodaysReservations()
+    {
+        var reservations = await  _unitOfWork.Reservations.GetGuestsArrivingAsync();
+        var result = _mapper.Map<IEnumerable<ReservationDto>>(reservations);
+        return result;
+    }
+
+    public async Task<IEnumerable<ReservationDto>> GetInHouseGuestListAsync()
+    {
+        var inhouseguestlist = await _unitOfWork.Reservations.GeInHouseGuestsAsync();
+        var result = _mapper.Map<IEnumerable<ReservationDto>>(inhouseguestlist);
+        return result;    
+    }
 }
